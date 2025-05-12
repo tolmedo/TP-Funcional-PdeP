@@ -36,29 +36,101 @@ fiat = UnAuto{marca = "Fiat", modelo = "600", desgasteChasis = 33, desgasteRueda
 peugeot :: Auto
 peugeot = UnAuto{marca = "Peugeot", modelo = "504", desgasteChasis = 0, desgasteRuedas = 0, velocidadMax = 40, apodo = ["El rey del desierto"], tiempoCarrera = 0}
 
---------- ESTADO DE SALUD DEL AUTO -------------
+------------------------------ PUNTO 2 ------------------------------
+--------------------- ESTADO DE SALUD DEL AUTO ----------------------
+
+------------- Saber si un auto ESTÁ EN BUEN ESTADO-------------
 estaEnBuenEstado :: Auto -> Bool
 estaEnBuenEstado auto
     | marca auto == "Peugeot" = False
     | tiempoCarrera auto < 100 = desgasteChasis auto < 20
     | otherwise = desgasteChasis auto < 40 && desgasteRuedas auto < 60
 
--- CASOS DE PRUEBAS --
+---------- Saber si un auto NO DA MÁS ----------
+autoNoDaMas :: Auto -> Bool
+autoNoDaMas auto =
+    (coincidePrimerApodo auto && desgasteChasis auto > 80) || desgasteRuedas auto > 80
+
+primerApodo :: Auto -> String
+primerApodo auto = head (apodo auto)
+
+coincidePrimerApodo :: Auto -> Bool
+coincidePrimerApodo auto = take 2 (primerApodo auto)  == "La"
+
+---------- Saber si un auto ES UN CHICHE ----------
+esUnChiche :: Auto -> Bool
+esUnChiche auto
+    | even (cantidadApodos auto) = desgasteChasis auto < 20
+    | otherwise = desgasteChasis auto < 50
+
+cantidadApodos :: Auto -> Number
+cantidadApodos auto = length (apodo auto)
+
+---------- Saber si un auto ES UNA JOYA ----------
+esUnaJoya :: Auto -> Bool
+esUnaJoya auto =
+    desgasteChasis auto == 0 &&
+    desgasteRuedas auto == 0 &&
+    length (apodo auto) <= 1
+
+---------- Conocer el NIVEL DE CHETEZ ----------
+nivelDeChetez :: Auto -> Number
+nivelDeChetez auto = 20 * cantidadApodos auto * caracteresModelo auto
+
+caracteresModelo :: Auto -> Number
+caracteresModelo auto = length (modelo auto)
+
+---------- Determinar capacidad supercalifragilisticaespialidosa ----------
+determinarCapacidad :: Auto -> Number
+determinarCapacidad auto = length (primerApodo auto)
+
+---------- Calcular qué tan RIESGOSO es un auto ----------
+riesgoAuto :: Auto -> Number
+riesgoAuto auto
+    | not (estaEnBuenEstado auto) = riesgoBase auto * 2
+    | otherwise = riesgoBase auto
+
+riesgoBase :: Auto -> Number
+riesgoBase auto = velocidadMax auto * (desgasteRuedas auto / 10)
+
+
+------------------------------ PUNTO 3 ------------------------------
+------------------------- MANOS A LA OBRA ---------------------------
+
+
+
+
+------------------------------ PUNTO 4 ------------------------------
+----------------------------- ¡PISTAS! ------------------------------
+
+
+
+
+------------------------------ PUNTO 5 ------------------------------
+-------------------------- NIVEL DE JOYEZ ---------------------------
+
+
+
+
+
+{-
+---------- CASOS DE PRUEBAS ----------
 pruebaPeugeot :: Auto
-pruebaPeugeot = UnAuto{}
+pruebaPeugeot = UnAuto{marca = "Peugeot"}
 
 pruebaLamborghini :: Auto
-pruebaLamborghini = UnAuto{}
+pruebaLamborghini = UnAuto{marca = "Lamborghini", tiempoCarrera = 99, desgasteChasis = 7}
 
 pruebaFiat :: Auto
-pruebaFiat = UnAuto{}
+pruebaFiat = UnAuto{marca = "Fiat", tiempoCarrera = 99, desgasteChasis = 33}
 
 pruebaFerrari1 :: Auto
-pruebaFerrari1 = UnAuto{}
+pruebaFerrari1 = UnAuto{marca = "Ferrari", tiempoCarrera = 130, desgasteChasis = 30, desgasteRuedas = 50}
 
 pruebaFerrari2 :: Auto
-pruebaFerrari2 = UnAuto{}
+pruebaFerrari2 = UnAuto{marca = "Ferrari", tiempoCarrera = 15, desgasteChasis = 45, desgasteRuedas = 50}
 
 pruebaFerrari3 :: Auto
-pruebaFerrari3 = UnAuto{}
+pruebaFerrari3 = UnAuto{marca = "Ferrari", tiempoCarrera = 150, desgasteChasis = 30, desgasteRuedas = 70}
 -- Esto habría que hablarlo bien, yo (Tomás) no logro entender del todo estos casos de pruebas
+-}
