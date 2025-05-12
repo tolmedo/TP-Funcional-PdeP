@@ -4,6 +4,6 @@
 
 ## Integrantes
 
-- integrante1 (usuario github)
+- OLMEDO, Tomás Anselmo (tolmedo)
 - integrante2 (usuario github)
 ...
