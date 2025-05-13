@@ -94,10 +94,37 @@ riesgoBase :: Auto -> Number
 riesgoBase auto = velocidadMax auto * (desgasteRuedas auto / 10)
 
 
------------------------------- PUNTO 3 ------------------------------
-------------------------- MANOS A LA OBRA ---------------------------
+---------------------------Reparar Auto------------------------------
+porcentajeNecesario :: Number
+porcentajeNecesario = 0.15
 
+repararAuto :: Auto -> Auto
+repararAuto auto = (bajarChasis porcentajeNecesario auto) {desgasteRuedas = 0} 
 
+bajarChasis :: Number -> Auto -> Auto 
+bajarChasis porcentajeNecesario auto = auto {desgasteChasis = porcentajeNecesario * desgasteChasis auto} 
+
+----------------------------Aplicar una penalidad---------------------
+
+aplicarPenalidad :: Number -> Auto -> Auto 
+aplicarPenalidad penalidadTiempo auto  = auto {tiempoCarrera = tiempoCarrera auto + penalidadTiempo}
+
+--------------------------Ponerle Nitro a un Auto---------------------
+ponerleNitroAUnAuto :: Auto -> Auto
+ponerleNitroAUnAuto auto = auto {velocidadMax = velocidadMax auto + porcentaje 20 auto}
+
+porcentaje :: Number -> Auto -> Number
+porcentaje porciento auto = (porciento * velocidadMax auto)/ 100 
+
+--------------------------Bautizar un Auto---------------------------
+
+bautizarAuto :: String -> Auto -> Auto 
+bautizarAuto apodoNuevo auto = auto {apodo = apodoNuevo : apodo auto} 
+
+------------------------Llevar un auto a un desarmadero--------------
+
+llevarAutoDesarmadero :: Auto -> String -> String -> Auto
+llevarAutoDesarmadero auto nuevamarca nuevomodelo = auto {marca = nuevamarca, modelo = nuevomodelo, apodo = ["Nunca Taxi"]}
 
 
 ------------------------------ PUNTO 4 ------------------------------
