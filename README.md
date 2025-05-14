@@ -4,6 +4,8 @@
 
 ## Integrantes
 
-- OLMEDO, Tomás Anselmo (tolmedo)
-- integrante2 (usuario github)
-...
+- Coaricona Cruz, Sheila Micaela (Shib1228)
+- Elías, Thiago (thiagoelias15)
+- Gigli, Maximiliano Ezequiel (Maximiliano-E-Gigli)
+- Lavagnio, Mateo (usaoz)
+- Olmedo, Tomás Anselmo (tolmedo)
