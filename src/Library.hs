@@ -192,9 +192,23 @@ transitarRulo tramo auto = auto {
 ------------------------------ PUNTO 5 ------------------------------
 -------------------------- NIVEL DE JOYEZ ---------------------------
 
+---------Nivel de Joyez-------------------
 
+nivelDeJoyez :: [Auto] -> Number
+nivelDeJoyez autos = sum (map unidadesDeJoyez (filter esUnaJoya autos))
 
+unidadesDeJoyez :: Auto -> Number
+unidadesDeJoyez auto
+        | tiempoCarrera auto < 50 = 1
+        | otherwise = 2
 
+--------Para entendidos-------------------
+
+paraEntendidos :: [Auto] -> Bool
+paraEntendidos autos = all estaEnBuenEstado autos && not (any menosDe200SegEnCarrera autos)
+
+menosDe200SegEnCarrera :: Auto -> Bool
+menosDe200SegEnCarrera auto = tiempoCarrera auto <200
 
 {-
 ---------- CASOS DE PRUEBAS ----------
@@ -216,4 +230,5 @@ pruebaFerrari2 = UnAuto{marca = "Ferrari", tiempoCarrera = 15, desgasteChasis = 
 pruebaFerrari3 :: Auto
 pruebaFerrari3 = UnAuto{marca = "Ferrari", tiempoCarrera = 150, desgasteChasis = 30, desgasteRuedas = 70}
 -- Esto habría que hablarlo bien, yo (Tomás) no logro entender del todo estos casos de pruebas
+
 -}
