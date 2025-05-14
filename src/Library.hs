@@ -15,13 +15,16 @@ data Auto = UnAuto{
     apodo :: [String]
 } deriving Show
 
-data Pista = UnaPista{
+data Tramo = UnTramo{
     angulo :: Number,
     longitud :: Number,
     cambios :: Number,
-    diametro :: Number,
-}deriving Show
+    diametro :: Number
+} deriving Show
 
+data Pista = UnaPista{
+    recorrido :: [Tramo]
+}
 ----------- ENTREGA 1 ----------------------
 --------------------------------------------
 
@@ -133,56 +136,56 @@ llevarAutoDesarmadero auto nuevamarca nuevomodelo = auto {marca = nuevamarca, mo
 ----------------------------- ¡PISTAS! ------------------------------
 
 --------------------Curvas--------------------
-curvaPeligrosa :: Pista
-curvaPeligrosa = UnaPista {angulo = 60, longitud = 300, cambios = 0, diametro = 0}
+curvaPeligrosa :: Tramo
+curvaPeligrosa = UnTramo {angulo = 60, longitud = 300, cambios = 0, diametro = 0}
 
-curvaTranca :: Pista
-curvaTranca = UnaPista {angulo = 110, longitud = 550. cambios = 0, diametro = 0}
+curvaTranca :: Tramo
+curvaTranca = UnTramo {angulo = 110, longitud = 550, cambios = 0, diametro = 0}
 
-transitarCurva :: Pista -> Auto -> Auto
-transitarCurva pista auto = auto {
-    desgasteRuedas = desgasteRuedas auto + 3 * longitud curva / angulo curva,
-    tiempoCarrera = tiempoCarrera auto + longitud curva / (velocidadMax auto / 2)
+transitarCurva :: Tramo -> Auto -> Auto
+transitarCurva tramo auto = auto {
+    desgasteRuedas = desgasteRuedas auto + 3 * longitud tramo / angulo tramo,
+    tiempoCarrera = tiempoCarrera auto + longitud tramo / (velocidadMax auto / 2)
 }
 
---------------------Tramos--------------------
-tramoRectoClassic :: Pista
-tramoRectoClassic = UnaPista {angulo = 0, longitud = 715, cambios = 0, diametro = 0}
+--------------------Rectos--------------------
+tramoRectoClassic :: Tramo
+tramoRectoClassic = UnTramo {angulo = 0, longitud = 715, cambios = 0, diametro = 0}
 
-tramito :: Pista
-tramito = UnaPista {angulo = 0, longitud = 260, cambios = 0, diametro = 0}
+tramito :: Tramo
+tramito = UnTramo {angulo = 0, longitud = 260, cambios = 0, diametro = 0}
 
-transitarTramo :: Pista -> Auto -> Auto
-transitarTramo pista auto = auto {
-    tiempoCarrera = tiempoCarrera auto + longitud pista / velocidadMax auto,
-    desgasteChasis = desgasteChasis auto + 0.01 * longitud pista
+transitarRecto :: Tramo -> Auto -> Auto
+transitarRecto tramo auto = auto {
+    tiempoCarrera = tiempoCarrera auto + longitud tramo / velocidadMax auto,
+    desgasteChasis = desgasteChasis auto + 0.01 * longitud tramo
 }
 
 --------------------ZigZag--------------------
-zigZagLoco :: Pista 
-zigZagLoco = UnaPista {angulo = 0, longitud = 0, cambios = 5, diametro = 0}
+zigZagLoco :: Tramo 
+zigZagLoco = UnTramo {angulo = 0, longitud = 0, cambios = 5, diametro = 0}
 
-casiCurva :: Pista 
-casiCurva = UnaPista {angulo = 0, longitud = 0, cambios = 1, diametro = 0}
+casiCurva :: Tramo 
+casiCurva = UnTramo {angulo = 0, longitud = 0, cambios = 1, diametro = 0}
 
-transitarZigZag :: Pista -> Auto -> Auto
-transitarZigZag pista auto = auto {
-    tiempoCarrera = tiempoCarrera auto + cambios pista * 3,
+transitarZigZag :: Tramo -> Auto -> Auto
+transitarZigZag tramo auto = auto {
+    tiempoCarrera = tiempoCarrera auto + cambios tramo * 3,
     desgasteChasis = desgasteChasis auto + 5,
-    desgasteRuedas = desgasteRuedas auto + velocidadMax auto * cambios pista / 10
+    desgasteRuedas = desgasteRuedas auto + velocidadMax auto * cambios tramo / 10
 }
 
 --------------------Rulos--------------------
-ruloClasico :: Pista
-ruloClasico  = UnaPista {angulo = 0, longitud = 0, cambios = 0, diametro = 13}
+ruloClasico :: Tramo
+ruloClasico  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 13}
 
-deseoDeMuerte :: Pista
-deseoDeMuerte  = UnaPista {angulo = 0, longitud = 0, cambios = 0, diametro = 26}
+deseoDeMuerte :: Tramo
+deseoDeMuerte  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 26}
 
-transitarRulo :: Pista -> Auto -> Auto
-transitarRulo pista auto = auto {
-    desgasteRuedas = desgasteRuedas auto + diametro pista * 1.5,
-    tiempoCarrera = tiempoCarrera auto + 5 * diametro psita / velocidadMax auto
+transitarRulo :: Tramo -> Auto -> Auto
+transitarRulo tramo auto = auto {
+    desgasteRuedas = desgasteRuedas auto + diametro tramo * 1.5,
+    tiempoCarrera = tiempoCarrera auto + 5 * diametro tramo / velocidadMax auto
 }
 
 
