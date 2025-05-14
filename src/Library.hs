@@ -16,12 +16,14 @@ data Auto = UnAuto{
 } deriving Show
 
 data Pista = UnaPista{
-    
-}
+    angulo :: Number,
+    longitud :: Number,
+    cambios :: Number,
+    diametro :: Number,
+}deriving Show
 
 ----------- ENTREGA 1 ----------------------
 --------------------------------------------
-
 
 ---------- MODELACIÓN DE AUTOS ------------
 ferrari :: Auto
@@ -130,7 +132,58 @@ llevarAutoDesarmadero auto nuevamarca nuevomodelo = auto {marca = nuevamarca, mo
 ------------------------------ PUNTO 4 ------------------------------
 ----------------------------- ¡PISTAS! ------------------------------
 
+--------------------Curvas--------------------
+curvaPeligrosa :: Pista
+curvaPeligrosa = UnaPista {angulo = 60, longitud = 300, cambios = 0, diametro = 0}
 
+curvaTranca :: Pista
+curvaTranca = UnaPista {angulo = 110, longitud = 550. cambios = 0, diametro = 0}
+
+transitarCurva :: Pista -> Auto -> Auto
+transitarCurva pista auto = auto {
+    desgasteRuedas = desgasteRuedas auto + 3 * longitud curva / angulo curva,
+    tiempoCarrera = tiempoCarrera auto + longitud curva / (velocidadMax auto / 2)
+}
+
+--------------------Tramos--------------------
+tramoRectoClassic :: Pista
+tramoRectoClassic = UnaPista {angulo = 0, longitud = 715, cambios = 0, diametro = 0}
+
+tramito :: Pista
+tramito = UnaPista {angulo = 0, longitud = 260, cambios = 0, diametro = 0}
+
+transitarTramo :: Pista -> Auto -> Auto
+transitarTramo pista auto = auto {
+    tiempoCarrera = tiempoCarrera auto + longitud pista / velocidadMax auto,
+    desgasteChasis = desgasteChasis auto + 0.01 * longitud pista
+}
+
+--------------------ZigZag--------------------
+zigZagLoco :: Pista 
+zigZagLoco = UnaPista {angulo = 0, longitud = 0, cambios = 5, diametro = 0}
+
+casiCurva :: Pista 
+casiCurva = UnaPista {angulo = 0, longitud = 0, cambios = 1, diametro = 0}
+
+transitarZigZag :: Pista -> Auto -> Auto
+transitarZigZag pista auto = auto {
+    tiempoCarrera = tiempoCarrera auto + cambios pista * 3,
+    desgasteChasis = desgasteChasis auto + 5,
+    desgasteRuedas = desgasteRuedas auto + velocidadMax auto * cambios pista / 10
+}
+
+--------------------Rulos--------------------
+ruloClasico :: Pista
+ruloClasico  = UnaPista {angulo = 0, longitud = 0, cambios = 0, diametro = 13}
+
+deseoDeMuerte :: Pista
+deseoDeMuerte  = UnaPista {angulo = 0, longitud = 0, cambios = 0, diametro = 26}
+
+transitarRulo :: Pista -> Auto -> Auto
+transitarRulo pista auto = auto {
+    desgasteRuedas = desgasteRuedas auto + diametro pista * 1.5,
+    tiempoCarrera = tiempoCarrera auto + 5 * diametro psita / velocidadMax auto,
+}
 
 
 ------------------------------ PUNTO 5 ------------------------------
