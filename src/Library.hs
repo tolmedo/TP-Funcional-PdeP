@@ -182,7 +182,7 @@ deseoDeMuerte  = UnaPista {angulo = 0, longitud = 0, cambios = 0, diametro = 26}
 transitarRulo :: Pista -> Auto -> Auto
 transitarRulo pista auto = auto {
     desgasteRuedas = desgasteRuedas auto + diametro pista * 1.5,
-    tiempoCarrera = tiempoCarrera auto + 5 * diametro psita / velocidadMax auto,
+    tiempoCarrera = tiempoCarrera auto + 5 * diametro psita / velocidadMax auto
 }
 
 
