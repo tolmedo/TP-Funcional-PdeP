@@ -80,17 +80,17 @@ correrTests = hspec $ do
         velocidadMax(ponerleNitroAUnAuto ferrari{velocidadMax=0}) `shouldBe` 0   
   
   describe "\n ------ Casos de Prueba PUNTO 3d ------" $ do
-    it "Bautizar “El diablo” a un auto marca Lamborghini debe contener en sus apodos “El diablo”" $ do
-        apodo(bautizarAuto "El diablo" lamborghini) `shouldBe` ["Lambo", "La bestia", "El diablo"]
-    it "Bautizar “El diablo” a un auto marca Lamborghini sin apodos debe sólo tener el apodo “El diablo”" $ do
-        apodo(bautizarAuto "El diablo" lamborghini{apodo=[]}) `shouldBe` ["El diablo"]
+    it "Bautizar `El diablo` a un auto marca Lamborghini debe contener en sus apodos El diablo" $ do
+        apodo(bautizarAuto "El diablo" lamborghini) `shouldBe` [ "El diablo", "Lambo", "La bestia" ]
+    it "Bautizar `El diablo` a un auto marca Lamborghini sin apodos debe sólo tener el apodo `El diablo`" $ do
+        apodo(bautizarAuto "El diablo" lamborghini{apodo=[]}) `shouldBe` [ "El diablo" ]
   
   describe "\n ------ Casos de Prueba PUNTO 3e ------" $ do
-    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca “Tesla” modelo “X”, la marca debería ser “Tesla”" $ do
+    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca `Tesla` modelo `X`, la marca debería ser `Tesla`" $ do
         marca(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` "Tesla"
-    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca “Tesla” modelo “X”, el modelo debería ser “X”" $ do
+    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca `Tesla` modelo `X`, el modelo debería ser `X`" $ do
         modelo(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` "X"
-    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca “Tesla” modelo “X”, solo debería tener el apodo “Nunca Taxi”" $ do
+    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca `Tesla` modelo `X`, solo debería tener el apodo `Nunca Taxi`" $ do
         apodo(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` ["Nunca Taxi"]
     -- punto 4 --
   describe "\n------ Casos de Prueba PUNTO 4a ------" $ do
