@@ -56,6 +56,42 @@ correrTests = hspec $ do
       riesgoAuto lamborghini `shouldBe` 29.2
     it "Un auto de marca Fiat: valor de riesgo debe ser igual a 237.6" $ do
       riesgoAuto fiat `shouldBe` 237.6
+  ---- punto 3 ----
+  describe "\n ------ Casos de Prueba PUNTO 3a ------" $ do 
+    it "Reparar un auto de marca Fiat debería tener  4,95 en chasis (33 * 0,15)" $ do
+        desgasteChasis (repararAuto fiat) `shouldBe` 4.95
+    it "Reparar un auto de marca Fiat debería tener  0 en ruedas" $ do
+        desgasteRuedas (repararAuto fiat) `shouldBe` 0
+    
+    it "Reparar un auto de marca Ferrari debería mantener sus desgastes en de chasis en 0 " $ do
+        desgasteChasis (repararAuto ferrari) `shouldBe` 0
+    it "Reparar un auto de marca Ferrari debería mantener sus desgastes de ruedas 0" $ do
+        desgasteRuedas (repararAuto ferrari) `shouldBe` 0
+  describe "\n ------ Casos de Prueba PUNTO 3b ------" $ do
+    it "Aplicar penalidad de 20 segundos un auto de marca ferrari con tiempo 10 segundos en pista debería subir su tiempo en pista a 30" $ do
+        tiempoCarrera(aplicarPenalidad 20 ferrari{tiempoCarrera=10}) `shouldBe` 30
+    it "Aplicar penalidad de 0 segundos a un auto de marca ferrari con tiempo 10 segundos en pista debería mantener su tiempo pista en 10" $ do
+        tiempoCarrera(aplicarPenalidad 0 ferrari{tiempoCarrera=10}) `shouldBe` 10
+
+  describe "\n ------ Casos de Prueba PUNTO 3c ------" $ do
+    it "Ponerle nitro a un fiat debería dar velocidad máxima de 52,8" $ do
+        velocidadMax(ponerleNitroAUnAuto fiat) `shouldBe` 52.8
+    it "Ponerle nitro a un fiat con velocidad máxima 0 debería mantener la velocidad máxima en 0" $ do
+        velocidadMax(ponerleNitroAUnAuto ferrari{velocidadMax=0}) `shouldBe` 0   
+  
+  describe "\n ------ Casos de Prueba PUNTO 3d ------" $ do
+    it "Bautizar “El diablo” a un auto marca Lamborghini debe contener en sus apodos “El diablo”" $ do
+        apodo(bautizarAuto "El diablo" lamborghini) `shouldBe` ["Lambo", "La bestia", "El diablo"]
+    it "Bautizar “El diablo” a un auto marca Lamborghini sin apodos debe sólo tener el apodo “El diablo”" $ do
+        apodo(bautizarAuto "El diablo" lamborghini{apodo=[]}) `shouldBe` ["El diablo"]
+  
+  describe "\n ------ Casos de Prueba PUNTO 3e ------" $ do
+    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca “Tesla” modelo “X”, la marca debería ser “Tesla”" $ do
+        marca(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` "Tesla"
+    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca “Tesla” modelo “X”, el modelo debería ser “X”" $ do
+        modelo(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` "X"
+    it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca “Tesla” modelo “X”, solo debería tener el apodo “Nunca Taxi”" $ do
+        apodo(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` ["Nunca Taxi"]
     -- punto 4 --
   describe "\n------ Casos de Prueba PUNTO 4a ------" $ do
     it "Transitar una curva peligrosa con un auto marca Ferrari deja el desgaste de ruedas en 15" $ do

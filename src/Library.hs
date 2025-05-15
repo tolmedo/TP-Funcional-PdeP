@@ -98,6 +98,8 @@ riesgoAuto auto
 riesgoBase :: Auto -> Number
 riesgoBase auto = velocidadMax auto * (desgasteRuedas auto / 10)
 
+------------------------------ PUNTO 3 ------------------------------
+-------------------------- MANOS A LA OBRA --------------------------
 
 ---------------------------Reparar Auto------------------------------
 porcentajeNecesario :: Number
