@@ -205,30 +205,8 @@ unidadesDeJoyez auto
 --------Para entendidos-------------------
 
 paraEntendidos :: [Auto] -> Bool
-paraEntendidos autos = all estaEnBuenEstado autos && not (any menosDe200SegEnCarrera autos)
+paraEntendidos autos = all estaEnBuenEstado autos && all menorIgualA200SegEnCarrera autos
 
-menosDe200SegEnCarrera :: Auto -> Bool
-menosDe200SegEnCarrera auto = tiempoCarrera auto <200
 
-{-
----------- CASOS DE PRUEBAS ----------
-pruebaPeugeot :: Auto
-pruebaPeugeot = UnAuto{marca = "Peugeot"}
-
-pruebaLamborghini :: Auto
-pruebaLamborghini = UnAuto{marca = "Lamborghini", tiempoCarrera = 99, desgasteChasis = 7}
-
-pruebaFiat :: Auto
-pruebaFiat = UnAuto{marca = "Fiat", tiempoCarrera = 99, desgasteChasis = 33}
-
-pruebaFerrari1 :: Auto
-pruebaFerrari1 = UnAuto{marca = "Ferrari", tiempoCarrera = 130, desgasteChasis = 30, desgasteRuedas = 50}
-
-pruebaFerrari2 :: Auto
-pruebaFerrari2 = UnAuto{marca = "Ferrari", tiempoCarrera = 15, desgasteChasis = 45, desgasteRuedas = 50}
-
-pruebaFerrari3 :: Auto
-pruebaFerrari3 = UnAuto{marca = "Ferrari", tiempoCarrera = 150, desgasteChasis = 30, desgasteRuedas = 70}
--- Esto habría que hablarlo bien, yo (Tomás) no logro entender del todo estos casos de pruebas
-
--}
+menorIgualA200SegEnCarrera :: Auto -> Bool
+menorIgualA200SegEnCarrera auto = tiempoCarrera auto <=200

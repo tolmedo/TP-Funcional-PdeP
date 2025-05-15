@@ -54,3 +54,16 @@ correrTests = hspec $ do
       desgasteRuedas (transitarRulo deseoDeMuerte ferrari) `shouldBe` 39.0
     it "Transitar un tramo deseoDeMuerte con un auto marca Ferrari El tiempo en pista es de 2" $ do
       tiempoCarrera (transitarRulo deseoDeMuerte ferrari) `shouldBe` 2
+    -- punto 5 --
+    it "El nivel de joyez es de 0 para el Ferrari" $ do
+      nivelDeJoyez [ferrari] `shouldBe` 0
+    it "El nivel de joyez es de 1 para un Peugeot con un tiempo de carrera de 49" $ do
+      nivelDeJoyez [peugeot {tiempoCarrera = 49}] `shouldBe` 1
+    it "El nivel de joyez es de 2 para un Peugeot con un tiempo de carrera de 50" $ do
+      nivelDeJoyez [peugeot {tiempoCarrera = 50}] `shouldBe` 2
+    it "El grupo con un Ferrari con un tiempo de carrera de 201 y otro con un tiempo de carrera de 200 no es para entendidos" $ do
+      paraEntendidos [ferrari {tiempoCarrera = 201}, ferrari {tiempoCarrera = 200}] `shouldBe` False
+    it "El grupo con un Ferrari con un tiempo de carrera de 200 y un Peugeot no es para entendidos" $ do
+      paraEntendidos [ferrari {tiempoCarrera = 200}, peugeot] `shouldBe` False
+    it "El grupo con un Ferrari con un tiempo de carrera de 200 y un Lamborghini con un tiempo de carrera de 200 es para entendidos" $ do
+      paraEntendidos [ferrari {tiempoCarrera = 200}, lamborghini {tiempoCarrera = 200}] `shouldBe` True
