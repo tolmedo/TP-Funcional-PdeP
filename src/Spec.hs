@@ -8,8 +8,56 @@ correrTests = hspec $ do
   describe "Test de ejemplo" $ do
     it "El pdepreludat se instaló correctamente" $ do
       doble 1 `shouldBe` 2
-
+    -- punto 2 --
+  describe "\n------ Casos de Prueba PUNTO 2a ------" $ do
+    it "Un auto marca Peugeot NO está en buen estado" $ do
+      estaEnBuenEstado peugeot `shouldBe` False
+    it "Un auto marca Lamborghini, con tiempo en pista 99 segundos y desgaste chasis 7: está en buen estado" $ do
+      estaEnBuenEstado lamborghini {tiempoCarrera = 99, desgasteChasis = 7} `shouldBe` True
+    it "Un auto marca Fiat, con tiempo en pista de 99 segundos y desgaste de chasis 33: NO está en buen estado" $ do
+      estaEnBuenEstado fiat {tiempoCarrera = 99, desgasteChasis = 33} `shouldBe` False
+    it "Un auto marca Ferrari que tiene 130 segundos de tiempo en pista con desgaste de ruedas 50 y chasis 30: está en buen estado" $ do
+      estaEnBuenEstado ferrari {tiempoCarrera = 130, desgasteChasis = 30, desgasteRuedas = 50} `shouldBe` True
+    it "Un auto marca Ferrari que tiene 15 segundos de tiempo en pista con desgaste de ruedas 50 y chasis 45: NO está en buen estado" $ do
+      estaEnBuenEstado ferrari {tiempoCarrera = 130, desgasteChasis = 45, desgasteRuedas = 50} `shouldBe` False
+    it "Un auto marca Ferrari que tiene 150 segundos de tiempo en pista con desgaste de ruedas 70 y chasis 30: NO está en buen estado" $ do
+      estaEnBuenEstado ferrari {tiempoCarrera = 130, desgasteChasis = 30, desgasteRuedas = 70} `shouldBe` False
+  describe "\n------ Casos de Prueba PUNTO 2b ------" $ do
+    it "Un auto de marca Ferrari con desgaste de ruedas 20 y chasis 90: No da más" $ do
+      autoNoDaMas ferrari {desgasteChasis = 90, desgasteRuedas = 20, apodo = ["La Ferrari"]} `shouldBe` True
+    it "Un auto de marca Ferrari con desgaste de chasis 20: Da para más" $ do
+      autoNoDaMas ferrari {desgasteChasis = 20} `shouldBe` False
+    it "Un auto de marca Lamborghini con desgaste de ruedas 90 y chasis 20: No da más" $ do
+      autoNoDaMas lamborghini {desgasteChasis = 20, desgasteRuedas = 90} `shouldBe` True
+    it "Un auto de marca Lamborghini: Da para más" $ do
+      autoNoDaMas lamborghini `shouldBe` False
+  describe "\n------ Casos de Prueba PUNTO 2c ------" $ do
+    it "Un auto de marca Lamborghini: Es un chice" $ do
+      esUnChiche lamborghini `shouldBe` True
+    it "Un auto de marca Lamborghini con desgaste de ruedas 90 y chasis 20: NO es un chice" $ do
+      esUnChiche lamborghini {desgasteChasis = 20, desgasteRuedas = 90} `shouldBe` False
+    it "Un auto de marca Ferrari con desgaste de ruedas 20 y chasis 90: NO es un chice" $ do
+      esUnChiche ferrari {desgasteRuedas = 20, desgasteChasis = 90} `shouldBe` False
+    it "Un auto de marca ferrari: Es un chice" $ do
+      esUnChiche ferrari `shouldBe` True
+  describe "\n------ Casos de Prueba PUNTO 2d ------" $ do
+    it "Un auto marca Peugeot: Es una joya" $ do
+      esUnaJoya peugeot `shouldBe` True
+    it "Un auto marca Ferrari: NO es una joya" $ do
+      esUnaJoya ferrari `shouldBe` False
+  describe "\n------ Casos de Prueba PUNTO 2e ------" $ do
+    it "Un auto marca ferrari: valor de chetez debe ser igual a 180" $ do
+      nivelDeChetez ferrari `shouldBe` 180
+  describe "\n------ Casos de Prueba PUNTO 2f ------" $ do
+    it "Un auto de marca Ferrari: valor de su capacidad debe ser igual a 7" $ do
+      determinarCapacidad ferrari `shouldBe` 7
+  describe "\n------ Casos de Prueba PUNTO 2g ------" $ do
+    it "Un auto de marca Lamborghini: valor de riesgo debe ser igual a 29.2" $ do
+      riesgoAuto lamborghini `shouldBe` 29.2
+    it "Un auto de marca Fiat: valor de riesgo debe ser igual a 237.6" $ do
+      riesgoAuto fiat `shouldBe` 237.6
     -- punto 4 --
+  describe "\n------ Casos de Prueba PUNTO 4a ------" $ do
     it "Transitar una curva peligrosa con un auto marca Ferrari deja el desgaste de ruedas en 15" $ do
       desgasteRuedas (transitarCurva curvaPeligrosa ferrari) `shouldBe` 15 
     it "Transitar una curva peligrosa  con un auto marca Ferrari mantiene el desgaste de chasis en 0" $ do
@@ -22,6 +70,7 @@ correrTests = hspec $ do
       desgasteChasis (transitarCurva curvaTranca ferrari) `shouldBe` 0
     it "Transitar una curva tranca  con un auto marca Peugeot el tiempo en pista es de 27.5" $ do
       tiempoCarrera (transitarCurva curvaTranca peugeot) `shouldBe` 27.5
+  describe "\n------ Casos de Prueba PUNTO 4b ------" $ do
     it "Transitar un tramo retro classic con un auto marca Ferrari tiene un desgaste de chasis de 7.15" $ do
       desgasteChasis (transitarRecto tramoRectoClassic ferrari) `shouldBe` 7.15
     it "Transitar un tramo retro classic con un auto marca Ferrari el tiempo en pista es de 11" $ do
@@ -30,6 +79,7 @@ correrTests = hspec $ do
       desgasteChasis (transitarRecto tramito ferrari) `shouldBe` 2.6
     it "Transitar un tramito con un auto marca Ferrari el tiempo en pista es de 4" $ do
       tiempoCarrera (transitarRecto tramito ferrari) `shouldBe` 4
+  describe "\n------ Casos de Prueba PUNTO 4c ------" $ do
     it "Transitar un tramo zigZagLoco con un auto marca Ferrari Tiene un desgaste de chasis de 5" $ do
       desgasteChasis (transitarZigZag zigZagLoco ferrari) `shouldBe` 5
     it "Transitar un tramo zigZagLoco con un auto marca Ferrari Tiene un desgaste de ruedas de 32.5" $ do
@@ -42,6 +92,7 @@ correrTests = hspec $ do
       desgasteRuedas (transitarZigZag casiCurva ferrari) `shouldBe` 6.5
     it "Transitar un tramo casiCurva con un auto marca Ferrari El tiempo en pista es de 3" $ do
       tiempoCarrera (transitarZigZag casiCurva ferrari) `shouldBe` 3
+  describe "\n------ Casos de Prueba PUNTO 4d ------" $ do
     it "Transitar un tramo ruloClasico con un auto marca Ferrari Tiene un desgaste de chasis de 0" $ do
       desgasteChasis (transitarRulo ruloClasico ferrari) `shouldBe` 0
     it "Transitar un tramo ruloClasico con un auto marca Ferrari Tiene un desgaste de ruedas de 19.5" $ do
@@ -55,12 +106,14 @@ correrTests = hspec $ do
     it "Transitar un tramo deseoDeMuerte con un auto marca Ferrari El tiempo en pista es de 2" $ do
       tiempoCarrera (transitarRulo deseoDeMuerte ferrari) `shouldBe` 2
     -- punto 5 --
+  describe "\n------ Casos de Prueba PUNTO 5a ------" $ do
     it "El nivel de joyez es de 0 para el Ferrari" $ do
       nivelDeJoyez [ferrari] `shouldBe` 0
     it "El nivel de joyez es de 1 para un Peugeot con un tiempo de carrera de 49" $ do
       nivelDeJoyez [peugeot {tiempoCarrera = 49}] `shouldBe` 1
     it "El nivel de joyez es de 2 para un Peugeot con un tiempo de carrera de 50" $ do
       nivelDeJoyez [peugeot {tiempoCarrera = 50}] `shouldBe` 2
+  describe "\n------ Casos de Prueba PUNTO 5b ------" $ do
     it "El grupo con un Ferrari con un tiempo de carrera de 201 y otro con un tiempo de carrera de 200 no es para entendidos" $ do
       paraEntendidos [ferrari {tiempoCarrera = 201}, ferrari {tiempoCarrera = 200}] `shouldBe` False
     it "El grupo con un Ferrari con un tiempo de carrera de 200 y un Peugeot no es para entendidos" $ do
