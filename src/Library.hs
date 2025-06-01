@@ -22,9 +22,7 @@ data Tramo = UnTramo{
     diametro :: Number
 } deriving Show
 
-data Pista = UnaPista{
-    recorrido :: [Tramo]
-}
+
 ----------- ENTREGA 1 ----------------------
 --------------------------------------------
 
@@ -215,8 +213,69 @@ menorIgualA200SegEnCarrera auto = tiempoCarrera auto <=200
 todoOk :: Auto -> Bool
 todoOk auto = estaEnBuenEstado auto && menorIgualA200SegEnCarrera auto
 
+---------------------------------------------------------------------
+------------------------------ Segunda ------------------------------
+------------------------------ Entrega ------------------------------
+---------------------------------------------------------------------
 
+------------------------------ PUNTO 1 ------------------------------
+---------------------- EQUIPOS DE COMPETICIÓN -----------------------
 
+data Equipo = UnEquipo{
+    nombre :: String,
+    autos :: [Auto],
+    presupuesto :: Number
+} deriving Show
+
+losAlocados :: Equipo
+losAlocados = UnEquipo{nombre = "Los Alocados", autos = [ferrari, ferrari], presupuesto = 70000}
+
+losTranquilos :: Equipo
+losTranquilos = UnEquipo{nombre = "Los Tranquilos", autos = [peugeot], presupuesto = 50000}
+
+losAmbiciosos :: Equipo
+losAmbiciosos = UnEquipo{nombre = "Los Ambiciosos", autos = [], presupuesto = 70000}
+
+---------- Agregar Auto a Equipo ----------
+costoInscripcionPorMS :: Number
+costoInscripcionPorMS = 1000
+
+agregarAuto :: Equipo -> Auto ->Equipo
+agregarAuto equipo auto
+    | inscripcionDentroDelPresupuesto auto (presupuesto equipo) = equipo {autos = auto : autos equipo, presupuesto = presupuesto equipo - costoInscripcion auto} 
+    | otherwise = equipo
+
+inscripcionDentroDelPresupuesto :: Auto -> Number -> Bool
+inscripcionDentroDelPresupuesto auto presupuestoActual = costoInscripcion auto <= presupuestoActual
+
+costoInscripcion :: Auto -> Number
+costoInscripcion auto = velocidadMax auto * costoInscripcionPorMS
+
+---------- Realizar una reparación de equipo ----------
+{-
+(No queda claro si va reparando uno por uno hasta que ya no se lo permite el presupuesto o si 
+revisa el coste de todos de una y recíen ahí decide si hacerlo o no)
+(Por ahora asumimos la segunda opción)
+-}
+losTops :: Equipo
+losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborghini{desgasteChasis=20}], presupuesto= 20000}
+
+unSueño :: Equipo
+unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}], presupuesto= 10000}
+
+costoReparacionPorPuntoChasis :: Number
+costoReparacionPorPuntoChasis = 500
+
+repararEquipo :: Equipo -> Equipo
+repararEquipo equipo
+    | costoReparacionAutos (autos equipo) <= presupuesto equipo = equipo{autos = map repararAuto (autos equipo), presupuesto = presupuesto equipo - costoReparacionAutos (autos equipo)}
+    | otherwise = equipo
+
+costoReparacionAutos :: [Auto] -> Number
+costoReparacionAutos grupoAutos = sum( map costoReparacion grupoAutos)
+
+costoReparacion :: Auto -> Number
+costoReparacion auto = desgasteChasis auto * (1 - porcentajeNecesario) * costoReparacionPorPuntoChasis
 {- ENTREGA 2
 
 1. a) hacer un data con la info de los equipos, modelar 2 equipos, uno con 70k de presupuesto, otro con 50k y un peugeot
@@ -299,4 +358,22 @@ data Tramo = UnTramo{
     turbo :: Bool
 } deriving Show
 
+
+
+
+-------------------
+Un prototipo feo
+-------------------
+repararEquipo :: Equipo -> Equipo
+repararEquipo equipo
+    | null (autos equipo)= equipo
+    | otherwise = repararEquipo(equipo{autos=})
+
+intentarRepararPrimero :: Equipo -> Equipo
+intentarRepararPrimero equipo
+    | primeroFueraDePresupuestoReparacion equipo = equipo
+    | otherwise = equipo{}
+
+primeroFueraDePresupuestoReparacion :: Equipo -> Bool
+primeroFueraDePresupuestoReparacion equipo = presupuesto equipo < costoReparacion(head(autos equipo))
 -}
