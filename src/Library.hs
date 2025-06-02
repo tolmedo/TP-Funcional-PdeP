@@ -310,7 +310,7 @@ costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
 -------------------------- EQUIPO INFINIA ---------------------------
 
 infinia :: Equipo
-infinia = UnEquipo{nombre = "Infinia", autos = take 3 (equipoInfinito ferrari 1), presupuesto = 5000}
+infinia = UnEquipo{nombre = "Infinia", autos = equipoInfinito ferrari 1, presupuesto = 5000}
 
 equipoInfinito :: Auto -> Number -> [Auto]
 equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax auto *n} : equipoInfinito auto (n+1)
