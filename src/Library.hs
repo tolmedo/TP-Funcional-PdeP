@@ -276,6 +276,26 @@ costoReparacionAutos grupoAutos = sum( map costoReparacion grupoAutos)
 
 costoReparacion :: Auto -> Number
 costoReparacion auto = desgasteChasis auto * (1 - porcentajeNecesario) * costoReparacionPorPuntoChasis
+
+------------------------------ PUNTO 3 ------------------------------
+-------------------------- EQUIPO INFINIA ---------------------------
+
+infinia :: Equipo
+infinia = UnEquipo{nombre = "Infinia", autos = take 3 (equipoInfinito ferrari 1), presupuesto = 5000}
+
+equipoInfinito :: Auto -> Number -> [Auto]
+equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax auto *n} : equipoInfinito auto (n+1)
+
+{-
+    i. Reparación de Equipo.
+
+    ii. Optimización.
+
+    iii. Ferrarizar.
+
+    iv. Costo de reparación.
+-}
+
 {- ENTREGA 2
 
 1. a) hacer un data con la info de los equipos, modelar 2 equipos, uno con 70k de presupuesto, otro con 50k y un peugeot
