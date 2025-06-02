@@ -252,30 +252,59 @@ costoInscripcion :: Auto -> Number
 costoInscripcion auto = velocidadMax auto * costoInscripcionPorMS
 
 ---------- Realizar una reparación de equipo ----------
-{-
-(No queda claro si va reparando uno por uno hasta que ya no se lo permite el presupuesto o si 
-revisa el coste de todos de una y recíen ahí decide si hacerlo o no)
-(Por ahora asumimos la segunda opción)
--}
 losTops :: Equipo
 losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborghini{desgasteChasis=20}], presupuesto= 20000}
 
 unSueño :: Equipo
 unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}], presupuesto= 10000}
+{- --Equipo para tests más detallados. Aunque el presupuesto sería suficiente para reparar los dos ferraris, debe parar al encontrar al fiat
+unSueño' :: Equipo
+unSueño' = UnEquipo{nombre="Un Sueño", autos=[ferrari{desgasteChasis=10}, fiat{desgasteChasis=50},ferrari{desgasteChasis=10}], presupuesto= 10000}
+-}
 
 costoReparacionPorPuntoChasis :: Number
 costoReparacionPorPuntoChasis = 500
 
 repararEquipo :: Equipo -> Equipo
 repararEquipo equipo
-    | costoReparacionAutos (autos equipo) <= presupuesto equipo = equipo{autos = map repararAuto (autos equipo), presupuesto = presupuesto equipo - costoReparacionAutos (autos equipo)}
-    | otherwise = equipo
+    | null (autos equipo) = equipo
+    | primeroFueraDePresupuestoReparacion equipo = equipo
+    | otherwise = equipo{autos = repararAuto(head(autos equipo)) : autos (siguienteReparacionEquipo equipo), presupuesto = presupuesto (siguienteReparacionEquipo equipo)}
 
-costoReparacionAutos :: [Auto] -> Number
-costoReparacionAutos grupoAutos = sum( map costoReparacion grupoAutos)
+siguienteReparacionEquipo :: Equipo -> Equipo
+siguienteReparacionEquipo equipo = repararEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoReparacionPrimerAutoEquipo equipo })
+
+primeroFueraDePresupuestoReparacion :: Equipo -> Bool
+primeroFueraDePresupuestoReparacion equipo = presupuesto equipo < costoReparacionPrimerAutoEquipo equipo
+
+costoReparacionPrimerAutoEquipo :: Equipo -> Number
+costoReparacionPrimerAutoEquipo =  costoReparacion . head . autos
 
 costoReparacion :: Auto -> Number
 costoReparacion auto = desgasteChasis auto * (1 - porcentajeNecesario) * costoReparacionPorPuntoChasis
+
+---------- Optimizar autos de equipo ----------
+
+costoNitroPorPuntoVelocidad :: Number
+costoNitroPorPuntoVelocidad = 100
+
+optimizarEquipo :: Equipo -> Equipo
+optimizarEquipo equipo
+    | null (autos equipo) = equipo
+    | primeroFueraDePresupuestoOptimizacion equipo = equipo
+    | otherwise = equipo{autos = ponerleNitroAUnAuto(head(autos equipo)) : autos (siguienteOptimizacionEquipo equipo), presupuesto = presupuesto (siguienteOptimizacionEquipo equipo)}
+
+siguienteOptimizacionEquipo :: Equipo -> Equipo
+siguienteOptimizacionEquipo equipo = optimizarEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoOptimizacionPrimerAutoEquipo equipo })
+
+primeroFueraDePresupuestoOptimizacion :: Equipo -> Bool
+primeroFueraDePresupuestoOptimizacion equipo = presupuesto equipo < costoOptimizacionPrimerAutoEquipo equipo
+
+costoOptimizacionPrimerAutoEquipo :: Equipo -> Number
+costoOptimizacionPrimerAutoEquipo =  costoOptimizacion . head . autos
+
+costoOptimizacion :: Auto -> Number
+costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
 
 ------------------------------ PUNTO 3 ------------------------------
 -------------------------- EQUIPO INFINIA ---------------------------
