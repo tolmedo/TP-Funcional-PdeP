@@ -305,6 +305,11 @@ costoOptimizacionPrimerAutoEquipo =  costoOptimizacion . head . autos
 
 costoOptimizacion :: Auto -> Number
 costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
+------------------------------ PUNTO 2 ------------------------------
+----------------------- COSTO REPARACIÓN TOTAL ----------------------
+
+costoTotal :: Equipo -> Number
+costoTotal equipo = sum (map costoReparacion (autos equipo))
 
 ------------------------------ PUNTO 3 ------------------------------
 -------------------------- EQUIPO INFINIA ---------------------------
