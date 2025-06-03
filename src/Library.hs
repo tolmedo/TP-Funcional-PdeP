@@ -308,8 +308,8 @@ costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
 ------------------------------ PUNTO 2 ------------------------------
 ----------------------- COSTO REPARACIÓN TOTAL ----------------------
 
-costoTotal :: Equipo -> Number
-costoTotal equipo = sum (map costoReparacion (autos equipo))
+costoReparacionEquipo :: Equipo -> Number
+costoReparacionEquipo equipo = sum (map costoReparacion (autos equipo))
 
 ------------------------------ PUNTO 3 ------------------------------
 -------------------------- EQUIPO INFINIA ---------------------------
@@ -321,13 +321,24 @@ equipoInfinito :: Auto -> Number -> [Auto]
 equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax auto *n} : equipoInfinito auto (n+1)
 
 {-
-    i. Reparación de Equipo.
+    i. repararEquipo: al recibir como entrada un Equipo cuya lista de autos es infinita, esta función no podrá
+    mostrar ningún resultado al nunca terminar de procesar la información. Sin embargo, en "repararEquipo" se
+    evalúa el costo de reparación de cada auto y se los repara siempre y cuando el presupuesto sea suficiente.
+    Entonces, "repararEquipo" va a tener efectos en la lista de autos del equipo Infinia, específicamente va a
+    reparar los primeros 11 autos, pero por ser una lista infinita no va a poder mostrarla.
 
-    ii. Optimización.
+    ii. optimizarEquipo: el caso de esta función será similar a "repararEquipo", en cuanto a que no podrá mostrar
+    ningún resultado porque recibe como entrada un Equipo que contiene una lista de autos infinita, la cual nunca
+    finalizará de procesar. Sin embargo, "optimizarEquipo" tampoco tiene efectos en el equipo Infinia, ya que ni
+    siquiera el primer auto de la lista podrá ser optimizado por falta de presupuesto. Para que al menos un auto
+    pudiera optimizarse, el presupuesto debería ser mínimo de 6500 (velocidadMax * costoNitroPorPuntoVelocidad).
 
-    iii. Ferrarizar.
+    iii. ferrarizar:
 
-    iv. Costo de reparación.
+    iv. costoReparacionEquipo: esta función no podrá mostrar resultado alguno, esto por recibir como entrada un Equipo
+    cuya lista de autos es infinita. Por ende, cuando se intente aplicar la función "map costoReparacion", la evaluación
+    de dicha función nunca va a completarse, haciendo imposible la evaluación de "sum" por requerir los resultados de
+    "map costoReparacion (autos equipo)".
 -}
 
 ------------------------------ PUNTO 4 ------------------------------
@@ -440,7 +451,7 @@ data Condiciones = Condiciones{
 ------------------------------ PUNTO 5 ------------------------------
 
 pasarPorTramo2 :: (Tramo -> Auto -> Auto) -> Tramo -> Auto -> Auto
-pasarPorTramo2 recorrerTramo tramo auto =
+pasarPorTramo2 recorrerTramo tramo auto
     | autoNoDaMas auto = auto
     | otherwise = recorrerTramo tramo auto
     
