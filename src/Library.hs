@@ -335,20 +335,31 @@ equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax au
 
 -----------------------TRAMO CON BOXES--------------------------------
 
---Primero aplico el tramo para que el auto quede con los datos actualizados (algunas funciones de tramos modifican el tiempo de carrera y lo necesito actualizado) y asi evaluar su estado. Luego, el tiempoDeCarrera tambien debe ser mnodificado sobre el auto actualizado
+aplicarBoxes :: Auto -> Tramo -> Auto 
+aplicarBoxes auto tramo 
+    |boxes (condiciones tramo) = entrarONoABoxes auto
+    |otherwise = auto
 
-entraABoxes :: (Tramo -> Auto -> Auto) -> Auto -> Tramo -> Auto 
-entraABoxes  recorrerTramo auto tramo 
-    |(not . estaEnBuenEstado . recorrerTramo tramo) auto = repararAuto(recorrerTramo tramo auto) {tiempoCarrera = tiempoCarrera (repararAuto(recorrerTramo tramo auto)) + 10}
-    |otherwise = recorrerTramo tramo auto
+entrarONoABoxes :: Auto -> Auto
+entrarONoABoxes auto
+    |not(estaEnBuenEstado auto) = repararAuto auto {tiempoCarrera = tiempoCarrera auto + 10}
+    |otherwise = auto
 
 -----------------------TRAMO MOJADO--------------------------------------
-aplicarMojado :: (Tramo -> Auto -> Auto) -> Auto -> Tramo -> Auto
-aplicarMojado recorrerTramo auto tramo = (recorrerTramo tramo auto) {tiempoCarrera = tiempoCarrera (recorrerTramo tramo auto) * 1.5}
+aplicarMojado ::  Auto -> Tramo -> Auto
+aplicarMojado auto tramo 
+    |mojado (condiciones tramo) = auto {tiempoCarrera = tiempoCarrera auto * 1.5}
+    |otherwise = auto
 
------------------------------TRAMO CON RIPIO----------------------------------
-aplicarRipio :: (Tramo -> Auto -> Auto) -> Auto -> Tramo -> Auto 
-aplicarRipio recorrerTramo auto tramo = duplicarEfecto (recorrerTramo tramo auto) auto
+-----------------------------TRAMO CON RIPIO----------------------------------MODIF
+
+--Para esta forma, ripio necesita el autoModificado y el auto anterior de todas formas, porque calcula la diferencia
+--NOTA: se podria controlar el paso a Boxes. Si ya tiene ripio le podriamos impedir el paso a Boxes...
+
+aplicarRipio :: Auto -> Auto -> Tramo -> Auto 
+aplicarRipio  auto autoAntesDelTramo tramo
+    |ripio (condiciones tramo) = duplicarEfecto auto autoAntesDelTramo
+    |otherwise = auto
 
 duplicarEfecto :: Auto -> Auto ->  Auto
 duplicarEfecto autoModificado auto = auto  {
@@ -356,16 +367,86 @@ duplicarEfecto autoModificado auto = auto  {
     desgasteChasis = desgasteChasis auto + (desgasteChasis autoModificado - desgasteChasis auto) *2,
     desgasteRuedas = desgasteRuedas auto + (desgasteRuedas autoModificado - desgasteRuedas auto) *2
 } 
+
 --REVISAR: Simplificar tiempoCarrera, desgasteChasis y desgasteRuedas
-----------------------------TRAMO OBSTRUCCION-------------------------------
-aplicarObstruccion :: (Tramo -> Auto -> Auto) -> Number -> Tramo -> Auto -> Auto
-aplicarObstruccion recorrerTramo mtsObstruidos tramo auto = recorrerTramo tramo auto {desgasteRuedas = desgasteRuedas (recorrerTramo tramo auto) + 2* mtsObstruidos }
+
+----------------------------TRAMO OBSTRUCCION-------------------------------MODIF
+aplicarObstruccion :: Auto -> Tramo -> Auto 
+aplicarObstruccion auto tramo 
+    |obstruccion (condiciones tramo) /= 0 =  auto {desgasteRuedas = desgasteRuedas auto + 2 * obstruccion (condiciones tramo)}
+    |otherwise = auto
 
 --REVISAR: metrosObstruidos (pasarlo como parametro o meterlo dentro de data Tramo)
-----------------------------TRAMO CON TURBO--------------------------------
+----------------------------TRAMO CON TURBO--------------------------------MODIF
 
-aplicarTurbo :: (Tramo -> Auto -> Auto) -> Tramo -> Auto -> Auto 
-aplicarTurbo recorrerTramo tramo auto = recorrerTramo tramo (auto {velocidadMax = velocidadMax auto*2}) {velocidadMax = velocidadMax auto} 
+aplicarTurbo :: Auto -> Tramo -> Auto  
+aplicarTurbo auto tramo 
+    |turbo (condiciones tramo) = auto {velocidadMax = velocidadMax auto*2} {velocidadMax = velocidadMax auto} 
+    |otherwise = auto
+
+---------------------------------
+funcionEstrella :: Auto -> Tramo -> Auto 
+funcionEstrella auto tramo 
+    |angulo tramo /= 0 &&  longitud tramo /= 0 = transitarCurva tramo auto
+    |cambios tramo /= 0 = transitarZigZag tramo auto
+    |diametro tramo /= 0 = transitarRulo tramo auto
+    |otherwise = transitarRecto tramo auto
+
+funcionMamushka :: Auto -> Tramo -> Auto
+funcionMamushka auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo (funcionEstrella auto tramo) tramo)tramo) auto tramo) tramo) tramo
+
+{-
+Explicacion funcion Mamushka: 
+
+funcionEstrella auto tramo  --> elige el tramo que se va recorrer y se lo aplica. Devuelve el autoLuegoDelTramo
+
+aplicarTurbo automodificado tramo --> Se fija si dentro del tramo el turbo esta activado. Si esta en true, lo modifica, sino lo deja igual
+
+aplicarObstruccion automodificadoQueDevolvioAplicarTurbo tramo -->verifica si le estan pasando una cantidad de metros. Si es distinto de 0 es porque hay obstruccion y le aplica los cambios. Sino, lo deja pasar
+
+aplicarRipio autoModificadoQueDevolvioObstruccion auto(el que te ingresan por consola, sin aplicar efectos de tramo) tramo  --> En esta version de aplicar ripio, necesita calcula la diferencia y para eso necesita el auto antes del tramo. Luego, lo mismo de siempre, verifica si el tramo tiene en True el ripio, si SI le aplica los cambios. Si NO lo deja pasar
+
+aplicarMojado autoModificadoQueDovolvioRipio tramo --> Verifica si el tramo tiene en True el mojado, si SI le aplica los cambios. Si NO, lo deja pasar 
+
+aplicarBoxes autoModificadoQueDevolvioMojado tramo --> Verifica si el tramo tiene en True Boxes. Si lo tiene, le aplica al auto la funcion de ver si el auto puede entrar o no a Boxes (y esa segunda funcion verifica si puede entrar o no). Si no lo tiene en True, lo deja salir sin cambios
+-}
+
+
+{-Pregunta[1]: Podria hacer que la funcionMamushka reciba el Number de MtsObstruccion, pero cada vez que se use funcionMamushka deberia pasarle un numero, independientemente que se use o no. Ejemplos de como seria el "pasaje por consola"
+Ej si se usa Obstruccion: autitoX tramoX 20  (aca le paso el auto, el tramo y los metros de obstruccion, porque si aplico obstruccion)
+Ej si NO se usa obstruccion: autitoX tramoX 0 (tendria que pasarle mtsObstruccion 0)
+
+Por eso directamente estoy haciendo que en el modelado del tramo, en condiciones, Obstruccion no sea un Bool, sino un Number y en caso de que no haya obstruccion que la obstruccion sea =0 y si SI hay que sea /= 0
+-}
+
+
+{--data Tramo = UnTramo{
+    angulo :: Number,
+    longitud :: Number,
+    cambios :: Number,
+    diametro :: Number,
+    condiciones:: Condiciones 
+} deriving Show
+
+data Condiciones = Condiciones{
+    boxes :: Bool,
+    ripio :: Bool,
+    mojado :: Bool,
+    obstruccion :: Number, REVISAR[1]
+    turbo :: Bool
+}deriving Show
+-}
+
+------------------------------ PUNTO 5 ------------------------------
+
+pasarPorTramo2 :: (Tramo -> Auto -> Auto) -> Tramo -> Auto -> Auto
+pasarPorTramo2 recorrerTramo tramo auto =
+    | autoNoDaMas auto = auto
+    | otherwise = recorrerTramo tramo auto
+    
+
+--Realizar la función que haga pasarPorTramo/2 que, dado un tramo y un auto, hace que el auto atraviese el tramo, siempre y cuando
+-- no pase que no da más al inicio del tramo. Si el escenario es que no da más, entonces el auto no recibe ningún efecto, ya que no pasa por el tramo.
 
 {- ENTREGA 2
 
