@@ -330,6 +330,43 @@ equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax au
     iv. Costo de reparación.
 -}
 
+------------------------------ PUNTO 4 ------------------------------
+---------------------- MODIFICADORES DE TRAMOS -----------------------
+
+-----------------------TRAMO CON BOXES--------------------------------
+
+--Primero aplico el tramo para que el auto quede con los datos actualizados (algunas funciones de tramos modifican el tiempo de carrera y lo necesito actualizado) y asi evaluar su estado. Luego, el tiempoDeCarrera tambien debe ser mnodificado sobre el auto actualizado
+
+entraABoxes :: (Tramo -> Auto -> Auto) -> Auto -> Tramo -> Auto 
+entraABoxes  recorrerTramo auto tramo 
+    |(not . estaEnBuenEstado . recorrerTramo tramo) auto = repararAuto(recorrerTramo tramo auto) {tiempoCarrera = tiempoCarrera (repararAuto(recorrerTramo tramo auto)) + 10}
+    |otherwise = recorrerTramo tramo auto
+
+-----------------------TRAMO MOJADO--------------------------------------
+aplicarMojado :: (Tramo -> Auto -> Auto) -> Auto -> Tramo -> Auto
+aplicarMojado recorrerTramo auto tramo = (recorrerTramo tramo auto) {tiempoCarrera = tiempoCarrera (recorrerTramo tramo auto) * 1.5}
+
+-----------------------------TRAMO CON RIPIO----------------------------------
+aplicarRipio :: (Tramo -> Auto -> Auto) -> Auto -> Tramo -> Auto 
+aplicarRipio recorrerTramo auto tramo = duplicarEfecto (recorrerTramo tramo auto) auto
+
+duplicarEfecto :: Auto -> Auto ->  Auto
+duplicarEfecto autoModificado auto = auto  {
+    tiempoCarrera = tiempoCarrera auto + (tiempoCarrera autoModificado - tiempoCarrera auto) *2 + tiempoCarrera autoModificado *2,
+    desgasteChasis = desgasteChasis auto + (desgasteChasis autoModificado - desgasteChasis auto) *2,
+    desgasteRuedas = desgasteRuedas auto + (desgasteRuedas autoModificado - desgasteRuedas auto) *2
+} 
+--REVISAR: Simplificar tiempoCarrera, desgasteChasis y desgasteRuedas
+----------------------------TRAMO OBSTRUCCION-------------------------------
+aplicarObstruccion :: (Tramo -> Auto -> Auto) -> Number -> Tramo -> Auto -> Auto
+aplicarObstruccion recorrerTramo mtsObstruidos tramo auto = recorrerTramo tramo auto {desgasteRuedas = desgasteRuedas (recorrerTramo tramo auto) + 2* mtsObstruidos }
+
+--REVISAR: metrosObstruidos (pasarlo como parametro o meterlo dentro de data Tramo)
+----------------------------TRAMO CON TURBO--------------------------------
+
+aplicarTurbo :: (Tramo -> Auto -> Auto) -> Tramo -> Auto -> Auto 
+aplicarTurbo recorrerTramo tramo auto = recorrerTramo tramo (auto {velocidadMax = velocidadMax auto*2}) {velocidadMax = velocidadMax auto} 
+
 {- ENTREGA 2
 
 1. a) hacer un data con la info de los equipos, modelar 2 equipos, uno con 70k de presupuesto, otro con 50k y un peugeot
