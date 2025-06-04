@@ -305,6 +305,32 @@ costoOptimizacionPrimerAutoEquipo =  costoOptimizacion . head . autos
 
 costoOptimizacion :: Auto -> Number
 costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
+
+---------- Optimizar autos de equipo ----------
+muchosFiats :: Equipo
+muchosFiats = UnEquipo{nombre="Muchos Fiats", autos=[fiat, fiat, fiat, ferrari, fiat, fiat], presupuesto= 20000}
+
+costoFerrarizar :: Number
+costoFerrarizar = 3500
+
+ferrarizarEquipo :: Equipo -> Equipo
+ferrarizarEquipo equipo
+    | null (autos equipo) || presupuesto equipo < costoFerrarizar = equipo
+    | primeroFerrari(autos equipo)= equipo{autos = head(autos equipo) : autos(siguienteSiYaFerrari equipo), presupuesto = presupuesto (siguienteSiYaFerrari equipo)}
+    | otherwise = equipo{autos = ferrarizar( head(autos equipo) ) : autos (siguienteFerrarizarEquipo equipo), presupuesto = presupuesto (siguienteFerrarizarEquipo equipo)}
+
+ferrarizar :: Auto -> Auto
+ferrarizar auto = llevarAutoDesarmadero auto "Ferrari" "F50"
+
+primeroFerrari :: [Auto] -> Bool
+primeroFerrari conjuntoAutos = marca (head conjuntoAutos) == "Ferrari"
+
+siguienteSiYaFerrari :: Equipo -> Equipo
+siguienteSiYaFerrari equipo = ferrarizarEquipo( equipo{autos=tail(autos equipo)})
+
+siguienteFerrarizarEquipo :: Equipo -> Equipo
+siguienteFerrarizarEquipo equipo = ferrarizarEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoFerrarizar })
+
 ------------------------------ PUNTO 2 ------------------------------
 ----------------------- COSTO REPARACIÓN TOTAL ----------------------
 
@@ -345,7 +371,7 @@ equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax au
 ---------------------- MODIFICADORES DE TRAMOS -----------------------
 
 -----------------------TRAMO CON BOXES--------------------------------
-
+{-
 aplicarBoxes :: Auto -> Tramo -> Auto 
 aplicarBoxes auto tramo 
     |boxes (condiciones tramo) = entrarONoABoxes auto
@@ -405,7 +431,7 @@ funcionEstrella auto tramo
 
 funcionMamushka :: Auto -> Tramo -> Auto
 funcionMamushka auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo (funcionEstrella auto tramo) tramo)tramo) auto tramo) tramo) tramo
-
+-}
 {-
 Explicacion funcion Mamushka: 
 
