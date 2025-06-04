@@ -19,9 +19,17 @@ data Tramo = UnTramo{
     angulo :: Number,
     longitud :: Number,
     cambios :: Number,
-    diametro :: Number
+    diametro :: Number,
+    condiciones:: Condiciones 
 } deriving Show
 
+data Condiciones = Condiciones{
+    boxes :: Bool,
+    ripio :: Bool,
+    mojado :: Bool,
+    obstruccion :: Number, 
+    turbo :: Bool
+}deriving Show
 
 ----------- ENTREGA 1 ----------------------
 --------------------------------------------
@@ -371,7 +379,7 @@ equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax au
 ---------------------- MODIFICADORES DE TRAMOS -----------------------
 
 -----------------------TRAMO CON BOXES--------------------------------
-{-
+
 aplicarBoxes :: Auto -> Tramo -> Auto 
 aplicarBoxes auto tramo 
     |boxes (condiciones tramo) = entrarONoABoxes auto
@@ -422,16 +430,16 @@ aplicarTurbo auto tramo
     |otherwise = auto
 
 ---------------------------------
-funcionEstrella :: Auto -> Tramo -> Auto 
-funcionEstrella auto tramo 
+aplicarEfectosTramo :: Auto -> Tramo -> Auto 
+aplicarEfectosTramo auto tramo 
     |angulo tramo /= 0 &&  longitud tramo /= 0 = transitarCurva tramo auto
     |cambios tramo /= 0 = transitarZigZag tramo auto
     |diametro tramo /= 0 = transitarRulo tramo auto
     |otherwise = transitarRecto tramo auto
 
-funcionMamushka :: Auto -> Tramo -> Auto
-funcionMamushka auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo (funcionEstrella auto tramo) tramo)tramo) auto tramo) tramo) tramo
--}
+verificarModificadoresTramo :: Auto -> Tramo -> Auto
+verificarModificadoresTramo auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo (aplicarEfectosTramo auto tramo) tramo)tramo) auto tramo) tramo) tramo
+
 {-
 Explicacion funcion Mamushka: 
 
