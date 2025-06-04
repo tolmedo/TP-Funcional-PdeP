@@ -485,6 +485,41 @@ pasarPorTramo2 recorrerTramo tramo auto
 --Realizar la función que haga pasarPorTramo/2 que, dado un tramo y un auto, hace que el auto atraviese el tramo, siempre y cuando
 -- no pase que no da más al inicio del tramo. Si el escenario es que no da más, entonces el auto no recibe ningún efecto, ya que no pasa por el tramo.
 
+------------------------------ PUNTO 6 ------------------------------
+------------------------ ATRAVESANDO PISTAS -------------------------
+data Pista = UnaPista{
+    nombrePista :: String,
+    pais :: String,
+    precioEntrada :: Number,
+    recorrido :: [Tramo]
+} deriving Show
+
+------------------ VUELTA A LA MANZANA ------------------------ 
+vueltaALaManzana :: Pista
+vueltaALaManzana = UnaPista{nombrePista = "La Manzana", pais = "Italia", precioEntrada = 30, recorrido = recorridoManzana}
+
+recto130 :: Tramo
+recto130 = UnTramo{angulo = 0, longitud = 130, cambios = 0, diametro = 0}
+
+curva90 :: Tramo
+curva90 = UnTramo{longitud = 13, angulo = 90, cambios = 0, diametro = 0}
+
+recorridoManzana :: [Tramo]
+recorridoManzana = [recto130, curva90, recto130, curva90, recto130, curva90, recto130, curva90]
+
+------------------------- SUPER PISTA ---------------------------
+superPista :: Pista
+superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEntrada = 300, recorrido = recorridoSuperPista}
+
+recorridoSuperPista :: [Tramo]
+recorridoSuperPista = []
+
+--recorridoSuperPista :: [Tramo]
+--recorridoSuperPista = [tramoRectoClassic, curvaTranca, tramitoMojado, tramitoTurbo, ruloDe10, curvaObstruccion, curva115, recto970, curvaPeligrosa, tramitoRipio, rectoBoxes, casiCurvaObstruccion, ZigZag2, deseoDeMuerteMojadoRipio, ruloClasico, zigZagLoco]
+
+-- FALTA MODELAR: tramitoMojado - tramitoTurbo - ruloDe10 - curvaObstruccion - curva115 - recto970 - tramitoRipio - rectoBoxes - casiCurvaObstruccion - zigZag2 - deseoMuerteMojadoRipio - 
+
+
 {- ENTREGA 2
 
 1. a) hacer un data con la info de los equipos, modelar 2 equipos, uno con 70k de presupuesto, otro con 50k y un peugeot
