@@ -31,6 +31,8 @@ data Condiciones = Condiciones{
     turbo :: Bool
 }deriving Show
 
+condicionesBasicas :: Condiciones
+condicionesBasicas = Condiciones{boxes=False, ripio=False, mojado=False, obstruccion=0, turbo=False}
 ----------- ENTREGA 1 ----------------------
 --------------------------------------------
 
@@ -145,10 +147,10 @@ llevarAutoDesarmadero auto nuevamarca nuevomodelo = auto {marca = nuevamarca, mo
 
 --------------------Curvas--------------------
 curvaPeligrosa :: Tramo
-curvaPeligrosa = UnTramo {angulo = 60, longitud = 300, cambios = 0, diametro = 0}
+curvaPeligrosa = UnTramo {angulo = 60, longitud = 300, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
 
 curvaTranca :: Tramo
-curvaTranca = UnTramo {angulo = 110, longitud = 550, cambios = 0, diametro = 0}
+curvaTranca = UnTramo {angulo = 110, longitud = 550, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
 
 transitarCurva :: Tramo -> Auto -> Auto
 transitarCurva tramo auto = auto {
@@ -158,10 +160,10 @@ transitarCurva tramo auto = auto {
 
 --------------------Rectos--------------------
 tramoRectoClassic :: Tramo
-tramoRectoClassic = UnTramo {angulo = 0, longitud = 715, cambios = 0, diametro = 0}
+tramoRectoClassic = UnTramo {angulo = 0, longitud = 715, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
 
 tramito :: Tramo
-tramito = UnTramo {angulo = 0, longitud = 260, cambios = 0, diametro = 0}
+tramito = UnTramo {angulo = 0, longitud = 260, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
 
 transitarRecto :: Tramo -> Auto -> Auto
 transitarRecto tramo auto = auto {
@@ -171,10 +173,10 @@ transitarRecto tramo auto = auto {
 
 --------------------ZigZag--------------------
 zigZagLoco :: Tramo 
-zigZagLoco = UnTramo {angulo = 0, longitud = 0, cambios = 5, diametro = 0}
+zigZagLoco = UnTramo {angulo = 0, longitud = 0, cambios = 5, diametro = 0, condiciones=condicionesBasicas}
 
 casiCurva :: Tramo 
-casiCurva = UnTramo {angulo = 0, longitud = 0, cambios = 1, diametro = 0}
+casiCurva = UnTramo {angulo = 0, longitud = 0, cambios = 1, diametro = 0, condiciones=condicionesBasicas}
 
 transitarZigZag :: Tramo -> Auto -> Auto
 transitarZigZag tramo auto = auto {
@@ -185,10 +187,10 @@ transitarZigZag tramo auto = auto {
 
 --------------------Rulos--------------------
 ruloClasico :: Tramo
-ruloClasico  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 13}
+ruloClasico  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 13, condiciones=condicionesBasicas}
 
 deseoDeMuerte :: Tramo
-deseoDeMuerte  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 26}
+deseoDeMuerte  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 26, condiciones=condicionesBasicas}
 
 transitarRulo :: Tramo -> Auto -> Auto
 transitarRulo tramo auto = auto {
@@ -391,9 +393,9 @@ entrarONoABoxes auto
     |otherwise = auto
 
 -----------------------TRAMO MOJADO--------------------------------------
-aplicarMojado ::  Auto -> Tramo -> Auto
-aplicarMojado auto tramo 
-    |mojado (condiciones tramo) = auto {tiempoCarrera = tiempoCarrera auto * 1.5}
+aplicarMojado ::  Auto -> Auto -> Tramo -> Auto
+aplicarMojado auto autoAntesDelTramo tramo
+    |mojado (condiciones tramo) = auto {tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera auto autoAntesDelTramo *0.5}
     |otherwise = auto
 
 -----------------------------TRAMO CON RIPIO----------------------------------MODIF
@@ -408,10 +410,13 @@ aplicarRipio  auto autoAntesDelTramo tramo
 
 duplicarEfecto :: Auto -> Auto ->  Auto
 duplicarEfecto autoModificado auto = auto  {
-    tiempoCarrera = tiempoCarrera auto + (tiempoCarrera autoModificado - tiempoCarrera auto) *2 + tiempoCarrera autoModificado *2,
-    desgasteChasis = desgasteChasis auto + (desgasteChasis autoModificado - desgasteChasis auto) *2,
-    desgasteRuedas = desgasteRuedas auto + (desgasteRuedas autoModificado - desgasteRuedas auto) *2
+    tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera autoModificado auto *2,
+    desgasteChasis = desgasteChasis auto + diferenciaParametro desgasteChasis autoModificado auto *2,
+    desgasteRuedas = desgasteRuedas auto + diferenciaParametro desgasteRuedas autoModificado auto *2
 } 
+
+diferenciaParametro :: (Auto -> Number ) -> Auto -> Auto -> Number
+diferenciaParametro parametro autoModificado autoViejo = parametro autoModificado - parametro autoViejo
 
 --REVISAR: Simplificar tiempoCarrera, desgasteChasis y desgasteRuedas
 
@@ -426,8 +431,8 @@ aplicarObstruccion auto tramo
 
 aplicarTurbo :: Auto -> Tramo -> Auto  
 aplicarTurbo auto tramo 
-    |turbo (condiciones tramo) = auto {velocidadMax = velocidadMax auto*2} {velocidadMax = velocidadMax auto} 
-    |otherwise = auto
+    |turbo (condiciones tramo) = (aplicarEfectosTramo auto{velocidadMax = velocidadMax auto *2} tramo){velocidadMax = velocidadMax auto} 
+    |otherwise = aplicarEfectosTramo auto tramo
 
 ---------------------------------
 aplicarEfectosTramo :: Auto -> Tramo -> Auto 
@@ -438,7 +443,7 @@ aplicarEfectosTramo auto tramo
     |otherwise = transitarRecto tramo auto
 
 verificarModificadoresTramo :: Auto -> Tramo -> Auto
-verificarModificadoresTramo auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo (aplicarEfectosTramo auto tramo) tramo)tramo) auto tramo) tramo) tramo
+verificarModificadoresTramo auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo auto tramo)tramo) auto tramo) auto tramo) tramo
 
 {-
 Explicacion funcion Mamushka: 
@@ -502,31 +507,51 @@ data Pista = UnaPista{
     recorrido :: [Tramo]
 } deriving Show
 
------------------- VUELTA A LA MANZANA ------------------------ 
+crearRectoBasico :: Number -> Tramo
+crearRectoBasico longitudRecto = UnTramo{angulo = 0, longitud = longitudRecto, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
+
+crearCurvaBasica :: Number -> Number ->Tramo
+crearCurvaBasica anguloCurva longitudCurva = UnTramo{angulo = anguloCurva, longitud = longitudCurva, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
+
+crearZigZagBasico :: Number -> Tramo
+crearZigZagBasico cambiosZigZag = UnTramo{angulo = 0, longitud = 0, cambios = cambiosZigZag, diametro = 0, condiciones=condicionesBasicas}
+
+crearRuloBasico :: Number -> Tramo
+crearRuloBasico diametroRulo = UnTramo{angulo = 0, longitud = 0, cambios = 0, diametro = diametroRulo, condiciones=condicionesBasicas}
+-------------- Vuelta a la Manzana --------------
 vueltaALaManzana :: Pista
-vueltaALaManzana = UnaPista{nombrePista = "La Manzana", pais = "Italia", precioEntrada = 30, recorrido = recorridoManzana}
+vueltaALaManzana = UnaPista{nombrePista = "La Manzana", pais = "Italia", precioEntrada = 30, recorrido = [
+    recto130, curva90, recto130, curva90, recto130, curva90, recto130, curva90]}
 
 recto130 :: Tramo
-recto130 = UnTramo{angulo = 0, longitud = 130, cambios = 0, diametro = 0}
+recto130 = crearRectoBasico 130
 
 curva90 :: Tramo
-curva90 = UnTramo{longitud = 13, angulo = 90, cambios = 0, diametro = 0}
-
-recorridoManzana :: [Tramo]
-recorridoManzana = [recto130, curva90, recto130, curva90, recto130, curva90, recto130, curva90]
-
-------------------------- SUPER PISTA ---------------------------
+curva90 = crearCurvaBasica 90 13
+-------------- Super Pista --------------
 superPista :: Pista
-superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEntrada = 300, recorrido = recorridoSuperPista}
+superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEntrada = 300, recorrido =[
+    tramoRectoClassic, 
+    curvaTranca,
+    tramito{condiciones= condicionesBasicas{turbo=True}}, --turbo
+    tramito{condiciones= condicionesBasicas{mojado=True}}, -- mojado
+    crearRuloBasico 10,
+    (crearCurvaBasica 80 400){condiciones= condicionesBasicas{obstruccion=2}}, --obstruccion 2m
+    crearCurvaBasica 115 650,
+    crearRectoBasico 970,
+    curvaPeligrosa,
+    tramito{condiciones= condicionesBasicas{ripio=True}}, --ripio
+    (crearRectoBasico 800){condiciones= condicionesBasicas{boxes=True}}, --boxes
+    casiCurva{condiciones= condicionesBasicas{obstruccion=5}}, --obstruccion 5m
+    crearZigZagBasico 2,
+    deseoDeMuerte{condiciones= condicionesBasicas{mojado=True, ripio=True}}, -- mojado ripio
+    ruloClasico,
+    zigZagLoco
+     ]}
 
-recorridoSuperPista :: [Tramo]
-recorridoSuperPista = []
-
---recorridoSuperPista :: [Tramo]
---recorridoSuperPista = [tramoRectoClassic, curvaTranca, tramitoMojado, tramitoTurbo, ruloDe10, curvaObstruccion, curva115, recto970, curvaPeligrosa, tramitoRipio, rectoBoxes, casiCurvaObstruccion, ZigZag2, deseoDeMuerteMojadoRipio, ruloClasico, zigZagLoco]
-
--- FALTA MODELAR: tramitoMojado - tramitoTurbo - ruloDe10 - curvaObstruccion - curva115 - recto970 - tramitoRipio - rectoBoxes - casiCurvaObstruccion - zigZag2 - deseoMuerteMojadoRipio - 
-
+--------------- PeganLaVuelta/2 ---------------
+-- peganLaVuelta2 :: Pista -> [Auto]
+-- peganLaVuelta2 pista conjuntoAutos =  map( pasarPorTramo2 (recorrido pista) )--pasarPorTramo2 
 
 {- ENTREGA 2
 
@@ -611,21 +636,4 @@ data Tramo = UnTramo{
 } deriving Show
 
 
-
-
--------------------
-Un prototipo feo
--------------------
-repararEquipo :: Equipo -> Equipo
-repararEquipo equipo
-    | null (autos equipo)= equipo
-    | otherwise = repararEquipo(equipo{autos=})
-
-intentarRepararPrimero :: Equipo -> Equipo
-intentarRepararPrimero equipo
-    | primeroFueraDePresupuestoReparacion equipo = equipo
-    | otherwise = equipo{}
-
-primeroFueraDePresupuestoReparacion :: Equipo -> Bool
-primeroFueraDePresupuestoReparacion equipo = presupuesto equipo < costoReparacion(head(autos equipo))
 -}
