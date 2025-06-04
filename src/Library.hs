@@ -556,25 +556,42 @@ peganLaVuelta2 pista conjuntoAutos = map (recorrerUnRecorrido  (recorrido pista)
 recorrerUnRecorrido :: [Tramo] -> Auto -> Auto
 recorrerUnRecorrido conjuntoDeTramos auto = foldl pasarPorTramo2  auto conjuntoDeTramos
 
-{-
+
 ------------------------------ PUNTO 7 ------------------------------
 ----------------------- TOUR DE BUENOS AIRES ------------------------
 
-data Carrera = unaCarrera{
+data Carrera = UnaCarrera{
     pista :: Pista,
     vueltas :: Number
 } deriving Show
 
 tourBuenosAires :: Carrera  
-tourBuenosAires = unaCarrera { pista=superPista, vueltas=20 }
-
-correrCarrera :: Carrera -> [Auto] -> [Auto]
-correrCarrera carrera autos = iterate (peganLaVuelta2 (pista carrera)) autos !! (vueltas carrera)
+tourBuenosAires = UnaCarrera { pista=superPista, vueltas=20 }
 
 sacarNoDaMas :: [Auto] -> [Auto]
 sacarNoDaMas autos = filter (not . autoNoDaMas) autos
--}
 
+correrCarrera :: Carrera -> [Auto] -> [Auto]
+correrCarrera carrera autos = iterate (peganLaVuelta2 (pista carrera)) (sacarNoDaMas autos) !! (vueltas carrera)
+
+--cuantasVueltas :: Carrera -> Auto -> Number
+
+{-
+
+tiempoParcial :: Carrera -> Number -> [Auto] -> [Auto]
+tiempoParcial carrera vuelta auto = correrCarrera carrera{vueltas=vuelta} [auto]
+
+ordenarPorTiempos :: Carrera -> [Auto] -> [Auto]
+ordenarPorTiempos carrera autos = sortBy (comparing tiempoCarrera)
+
+darGanador :: Carrera -> [Auto] -> Auto
+darGanador carrera autos = head (ordenarPorTiempos carrera autos)
+
+ordenarPorTiempo :: [Auto] -> [Auto]
+ordenarPorTiempo conjuntoAutos
+    | tiempoCarrera(head(conjuntoAutos)) > tiempoCarrera(tail(conjuntoAutos)) = 
+
+-}
 {- ENTREGA 2
 
 1. a) hacer un data con la info de los equipos, modelar 2 equipos, uno con 70k de presupuesto, otro con 50k y un peugeot
