@@ -489,10 +489,10 @@ data Condiciones = Condiciones{
 
 ------------------------------ PUNTO 5 ------------------------------
 
-pasarPorTramo2 :: (Tramo -> Auto -> Auto) -> Tramo -> Auto -> Auto
-pasarPorTramo2 recorrerTramo tramo auto
+pasarPorTramo2 :: Auto -> Tramo -> Auto
+pasarPorTramo2 auto tramo
     | autoNoDaMas auto = auto
-    | otherwise = recorrerTramo tramo auto
+    | otherwise = verificarModificadoresTramo auto tramo
     
 
 --Realizar la función que haga pasarPorTramo/2 que, dado un tramo y un auto, hace que el auto atraviese el tramo, siempre y cuando
@@ -550,8 +550,30 @@ superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEnt
      ]}
 
 --------------- PeganLaVuelta/2 ---------------
--- peganLaVuelta2 :: Pista -> [Auto]
--- peganLaVuelta2 pista conjuntoAutos =  map( pasarPorTramo2 (recorrido pista) )--pasarPorTramo2 
+peganLaVuelta2 :: Pista -> [Auto] -> [Auto]
+peganLaVuelta2 pista conjuntoAutos = map (recorrerUnRecorrido  (recorrido pista)) conjuntoAutos
+
+recorrerUnRecorrido :: [Tramo] -> Auto -> Auto
+recorrerUnRecorrido conjuntoDeTramos auto = foldl pasarPorTramo2  auto conjuntoDeTramos
+
+{-
+------------------------------ PUNTO 7 ------------------------------
+----------------------- TOUR DE BUENOS AIRES ------------------------
+
+data Carrera = unaCarrera{
+    pista :: Pista,
+    vueltas :: Number
+} deriving Show
+
+tourBuenosAires :: Carrera  
+tourBuenosAires = unaCarrera { pista=superPista, vueltas=20 }
+
+correrCarrera :: Carrera -> [Auto] -> [Auto]
+correrCarrera carrera autos = iterate (peganLaVuelta2 (pista carrera)) autos !! (vueltas carrera)
+
+sacarNoDaMas :: [Auto] -> [Auto]
+sacarNoDaMas autos = filter (not . autoNoDaMas) autos
+-}
 
 {- ENTREGA 2
 
