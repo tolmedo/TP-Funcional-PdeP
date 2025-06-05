@@ -174,9 +174,9 @@ correrTests = hspec $ do
       tiempoCarrera (last(peganLaVuelta2 vueltaALaManzana [ferrari {desgasteRuedas = 79}, peugeot {desgasteRuedas = 79}])) `shouldBe` 11.7
   describe "\n------ Casos de Prueba PUNTO 7 ------" $ do
     it "Tiempo parcial del primer auto en la lista en completar la segunda vuelta" $ do
-      tiempoParcialPrimero tourDeItalia 2 [ferrari, peugeot, fiat, lamborghini] `shouldBe` 19.2
+      tiempoParcialPrimero tourDeItalia 2 [ferrari, peugeot, lamborghini, fiat] `shouldBe` 19.2
     it "El ganador es el Lamborghini" $ do
-      darGanador tourDeItalia [ferrari, peugeot, fiat, lamborghini] `shouldBe` head(correrCarrera tourDeItalia [lamborghini])
+      darGanador tourDeItalia [ferrari, peugeot, lamborghini, fiat] `shouldBe` head(correrCarrera tourDeItalia [lamborghini])
     it "Cuantos autos terminaron la carrera" $ do
       cantidadAutosQueTerminaron tourDeItalia [ferrari, peugeot, lamborghini, fiat, fiat{desgasteRuedas=79}] `shouldBe` 4
     it "Tiempo total del segundo en salir" $ do

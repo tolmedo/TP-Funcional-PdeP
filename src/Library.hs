@@ -282,11 +282,6 @@ losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborg
 unSueño :: Equipo
 unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}, peugeot{desgasteChasis=0}], presupuesto= 10000}
 
-{- --Equipo para tests más detallados. Aunque el presupuesto sería suficiente para reparar los dos ferraris, debe parar al encontrar al fiat
-unSueño' :: Equipo
-unSueño' = UnEquipo{nombre="Un Sueño", autos=[ferrari{desgasteChasis=10}, fiat{desgasteChasis=50},ferrari{desgasteChasis=10}], presupuesto= 10000}
--}
-
 costoReparacionPorPuntoChasis :: Number
 costoReparacionPorPuntoChasis = 500
 
@@ -421,9 +416,6 @@ aplicarMojado auto autoAntesDelTramo tramo
     |otherwise = auto
 
 -----------------------------TRAMO CON RIPIO----------------------------------
-
---Para esta forma, ripio necesita el autoModificado y el auto anterior de todas formas, porque calcula la diferencia
---NOTA: se podria controlar el paso a Boxes. Si ya tiene ripio le podriamos impedir el paso a Boxes...
 
 aplicarRipio :: Auto -> Auto -> Tramo -> Auto 
 aplicarRipio  auto autoAntesDelTramo tramo
