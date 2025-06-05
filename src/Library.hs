@@ -1,4 +1,4 @@
-module Library where
+module Library where 
 import PdePreludat
 
 doble :: Number -> Number
@@ -247,6 +247,7 @@ losAmbiciosos :: Equipo
 losAmbiciosos = UnEquipo{nombre = "Los Ambiciosos", autos = [], presupuesto = 70000}
 
 ---------- Agregar Auto a Equipo ----------
+
 costoInscripcionPorMS :: Number
 costoInscripcionPorMS = 1000
 
@@ -262,11 +263,13 @@ costoInscripcion :: Auto -> Number
 costoInscripcion auto = velocidadMax auto * costoInscripcionPorMS
 
 ---------- Realizar una reparación de equipo ----------
+
 losTops :: Equipo
 losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborghini{desgasteChasis=20}], presupuesto= 20000}
 
 unSueño :: Equipo
 unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}], presupuesto= 10000}
+
 {- --Equipo para tests más detallados. Aunque el presupuesto sería suficiente para reparar los dos ferraris, debe parar al encontrar al fiat
 unSueño' :: Equipo
 unSueño' = UnEquipo{nombre="Un Sueño", autos=[ferrari{desgasteChasis=10}, fiat{desgasteChasis=50},ferrari{desgasteChasis=10}], presupuesto= 10000}
@@ -317,6 +320,7 @@ costoOptimizacion :: Auto -> Number
 costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
 
 ---------- Optimizar autos de equipo ----------
+
 muchosFiats :: Equipo
 muchosFiats = UnEquipo{nombre="Muchos Fiats", autos=[fiat, fiat, fiat, ferrari, fiat, fiat], presupuesto= 20000}
 
@@ -369,7 +373,10 @@ equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax au
     siquiera el primer auto de la lista podrá ser optimizado por falta de presupuesto. Para que al menos un auto
     pudiera optimizarse, el presupuesto debería ser mínimo de 6500 (velocidadMax * costoNitroPorPuntoVelocidad).
 
-    iii. ferrarizar:
+    iii. ferrarizarEquipo: esta función no va a poder mostrar ningún resultado ya que recibe un Equipo cuya lista
+    de autos es infinita. Si bien "ferrarizarEquipo" recorre la lista y ferrariza (cambia marca y modelo) hasta que
+    le alcance el presupuesto, al ser una lista infinita nunca va a mostrar ningún resultado. Además, el equipo Infinia
+    es un Equipo compuesto por completo de autos Ferrari, por lo que no tendría sentido aplicar esta función.
 
     iv. costoReparacionEquipo: esta función no podrá mostrar resultado alguno, esto por recibir como entrada un Equipo
     cuya lista de autos es infinita. Por ende, cuando se intente aplicar la función "map costoReparacion", la evaluación
@@ -398,7 +405,7 @@ aplicarMojado auto autoAntesDelTramo tramo
     |mojado (condiciones tramo) = auto {tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera auto autoAntesDelTramo *0.5}
     |otherwise = auto
 
------------------------------TRAMO CON RIPIO----------------------------------MODIF
+-----------------------------TRAMO CON RIPIO----------------------------------
 
 --Para esta forma, ripio necesita el autoModificado y el auto anterior de todas formas, porque calcula la diferencia
 --NOTA: se podria controlar el paso a Boxes. Si ya tiene ripio le podriamos impedir el paso a Boxes...
@@ -418,16 +425,13 @@ duplicarEfecto autoModificado auto = auto  {
 diferenciaParametro :: (Auto -> Number ) -> Auto -> Auto -> Number
 diferenciaParametro parametro autoModificado autoViejo = parametro autoModificado - parametro autoViejo
 
---REVISAR: Simplificar tiempoCarrera, desgasteChasis y desgasteRuedas
-
-----------------------------TRAMO OBSTRUCCION-------------------------------MODIF
+----------------------------TRAMO OBSTRUCCION-------------------------------
 aplicarObstruccion :: Auto -> Tramo -> Auto 
 aplicarObstruccion auto tramo 
     |obstruccion (condiciones tramo) /= 0 =  auto {desgasteRuedas = desgasteRuedas auto + 2 * obstruccion (condiciones tramo)}
     |otherwise = auto
 
---REVISAR: metrosObstruidos (pasarlo como parametro o meterlo dentro de data Tramo)
-----------------------------TRAMO CON TURBO--------------------------------MODIF
+----------------------------TRAMO CON TURBO--------------------------------
 
 aplicarTurbo :: Auto -> Tramo -> Auto  
 aplicarTurbo auto tramo 
@@ -469,24 +473,6 @@ Ej si NO se usa obstruccion: autitoX tramoX 0 (tendria que pasarle mtsObstruccio
 Por eso directamente estoy haciendo que en el modelado del tramo, en condiciones, Obstruccion no sea un Bool, sino un Number y en caso de que no haya obstruccion que la obstruccion sea =0 y si SI hay que sea /= 0
 -}
 
-
-{--data Tramo = UnTramo{
-    angulo :: Number,
-    longitud :: Number,
-    cambios :: Number,
-    diametro :: Number,
-    condiciones:: Condiciones 
-} deriving Show
-
-data Condiciones = Condiciones{
-    boxes :: Bool,
-    ripio :: Bool,
-    mojado :: Bool,
-    obstruccion :: Number, REVISAR[1]
-    turbo :: Bool
-}deriving Show
--}
-
 ------------------------------ PUNTO 5 ------------------------------
 
 pasarPorTramo2 :: Auto -> Tramo -> Auto
@@ -494,10 +480,6 @@ pasarPorTramo2 auto tramo
     | autoNoDaMas auto = auto
     | otherwise = verificarModificadoresTramo auto tramo
     
-
---Realizar la función que haga pasarPorTramo/2 que, dado un tramo y un auto, hace que el auto atraviese el tramo, siempre y cuando
--- no pase que no da más al inicio del tramo. Si el escenario es que no da más, entonces el auto no recibe ningún efecto, ya que no pasa por el tramo.
-
 ------------------------------ PUNTO 6 ------------------------------
 ------------------------ ATRAVESANDO PISTAS -------------------------
 data Pista = UnaPista{
@@ -518,7 +500,9 @@ crearZigZagBasico cambiosZigZag = UnTramo{angulo = 0, longitud = 0, cambios = ca
 
 crearRuloBasico :: Number -> Tramo
 crearRuloBasico diametroRulo = UnTramo{angulo = 0, longitud = 0, cambios = 0, diametro = diametroRulo, condiciones=condicionesBasicas}
+
 -------------- Vuelta a la Manzana --------------
+
 vueltaALaManzana :: Pista
 vueltaALaManzana = UnaPista{nombrePista = "La Manzana", pais = "Italia", precioEntrada = 30, recorrido = [
     recto130, curva90, recto130, curva90, recto130, curva90, recto130, curva90]}
@@ -528,7 +512,9 @@ recto130 = crearRectoBasico 130
 
 curva90 :: Tramo
 curva90 = crearCurvaBasica 90 13
+
 -------------- Super Pista --------------
+
 superPista :: Pista
 superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEntrada = 300, recorrido =[
     tramoRectoClassic, 
@@ -550,12 +536,12 @@ superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEnt
      ]}
 
 --------------- PeganLaVuelta/2 ---------------
+
 peganLaVuelta2 :: Pista -> [Auto] -> [Auto]
 peganLaVuelta2 pista conjuntoAutos = map (recorrerUnRecorrido  (recorrido pista)) conjuntoAutos
 
 recorrerUnRecorrido :: [Tramo] -> Auto -> Auto
 recorrerUnRecorrido conjuntoDeTramos auto = foldl pasarPorTramo2  auto conjuntoDeTramos
-
 
 ------------------------------ PUNTO 7 ------------------------------
 ----------------------- TOUR DE BUENOS AIRES ------------------------
@@ -574,105 +560,83 @@ sacarNoDaMas autos = filter (not . autoNoDaMas) autos
 correrCarrera :: Carrera -> [Auto] -> [Auto]
 correrCarrera carrera autos = iterate (peganLaVuelta2 (pista carrera)) (sacarNoDaMas autos) !! (vueltas carrera)
 
---cuantasVueltas :: Carrera -> Auto -> Number
+vuelta :: Number
+vuelta = 2
 
-{-
-
-tiempoParcial :: Carrera -> Number -> [Auto] -> [Auto]
-tiempoParcial carrera vuelta auto = correrCarrera carrera{vueltas=vuelta} [auto]
-
-ordenarPorTiempos :: Carrera -> [Auto] -> [Auto]
-ordenarPorTiempos carrera autos = sortBy (comparing tiempoCarrera)
+tiempoParcialPrimerAutoEn2Vueltas :: Carrera -> Number -> [Auto] -> Auto
+tiempoParcialPrimerAutoEn2Vueltas carrera vuelta auto = head (correrCarrera carrera {vueltas = vuelta} auto)
 
 darGanador :: Carrera -> [Auto] -> Auto
-darGanador carrera autos = head (ordenarPorTiempos carrera autos)
+darGanador carrera autos = foldl1 autoDeMejorTiempo (correrCarrera carrera autos)
 
-ordenarPorTiempo :: [Auto] -> [Auto]
-ordenarPorTiempo conjuntoAutos
-    | tiempoCarrera(head(conjuntoAutos)) > tiempoCarrera(tail(conjuntoAutos)) = 
+autoDeMejorTiempo :: Auto -> Auto -> Auto
+autoDeMejorTiempo primerAuto segundoAuto
+    | tiempoCarrera primerAuto > tiempoCarrera segundoAuto = segundoAuto
+    | otherwise = primerAuto
 
--}
 {- ENTREGA 2
 
-1. a) hacer un data con la info de los equipos, modelar 2 equipos, uno con 70k de presupuesto, otro con 50k y un peugeot
-    agregar auto ::  auto ->  equipo
-    
+1. a) REVISADO (B)
+   b) REVISADO (B)
+   c) REVISADO (B)   
+   d) REVISADO (B)
+   
+2. REVISADO (B)
 
-   b) reparacion en equipo :: recibe equipo -> devuelve equipo
-    hay plata -> se repara el 85% de c/auto (mientras haya presupuesto)(explora de forma recursiva la lista?)
-    c/punto de desgasteChasis = $500
+3. REVISADO (B)
 
+4. a) REVISADO (B)
 
-   c) optimizar autos ::  equipo ->  equipo
-   otra cosa recursiva que vaya auto por auto poniendo nitro hasta quedarse sin plata.
-   El costo de poner nitro a un auto es de la velocidad máxima del auto (antes de poner nitro) * $100
-
-   d) ferrarizar ::  equipo ->  equipo
-   va de auto a auto convirtiendolos en ferraris y F50 hasta quedarse sin plata.
-   Si un auto del equipo ya era Ferrari, queda igual que como estaba y no hay costo para ese auto.
-   El costo de convertir un auto en una Ferrari es de $3500
-
-2. Costo total reparacion :: equipo -> number
-
-3. funcion que haga el equipo infinito
-
-4. a) agregar boxes a Tramo
-    boxes :: auto -> auto
-    auto entra a boxes si NO estaEnBuenEstado
-    si entra a boxes -> se repara -> agregar 10 segundos adicionales a tiempoCarrera
-
-   b) agregar mojado
+   b) agregar mojado --> R E V I S A R
     suma 50% mas del tiempo de carrera que produce originalmente
    
-   c) agregar ripio
-   produce el doble de efecto y se tarda el doble en atravesarlo.
-   No hay boxes con ripio
+   c) REVISADO (B)
 
-   d) agregar obstruccion
-   2 puntos de desgaste en las ruedas por metro que este obstruido
+   d) REVISADO (B) // Recordar revisar metrosObstruidos
 
-   e) agregar turbo
-   doble de velocidad maxima, luego de atravesar el tramo, se pierde el turbo
+   e) REVISADO (B) // Revisar la función mamushka
 
-5.  pasarPorTramo/2 :: tramo -> auto -> auto
-Va pasando por los tramos, pero primero analiza si su durabilidad se lo permite (con funcion "noDaMas").
-Si no puede, no le afecta.
+5. REVISADO (B)
 
-6. definir las pistas vueltaALaManzana, superPista y la funcion peganLaVuelta/2 (Pista -> [auto] -> [auto]?)
-
-esto ya esta definido arriba de todo, pero esta incompleto. poner esta
-
-data Pista = UnaPista{
-    nombre :: String,
-    pais :: String,
-    precioEntrada :: Number,
-    recorrido :: [Tramo]
-} deriving Show
-
+6. REVISADO (B)
 
 7.
+
 data Carrera = unaCarrera{
     pista :: Pista,
     vueltas :: Number
 } deriving Show
 hacer una funcion "correrCarrera" que reciba una carrera y lista de autos o equipos y que simule la carrera.
 
-
------
-
-data Tramo = UnTramo{
-    angulo :: Number,
-    longitud :: Number,
-    cambios :: Number,
-    diametro :: Number,
-
-    -- Lo nuevo
-    boxes :: Bool,
-    ripio :: Bool,
-    mojado :: Bool,
-    obstruccion :: Bool,
-    turbo :: Bool
-} deriving Show
+// FALTAN LOS TEST
 
 
+-- Implementación simple de quicksort con predicado personalizado
+quicksort :: (a -> a -> Bool) -> [a] -> [a]
+quicksort _ []     = []
+quicksort cmp (x:xs) =
+  quicksort cmp [y | y <- xs, cmp y x] ++ [x] ++ quicksort cmp [y | y <- xs, not (cmp y x)]
+
+-- Ejemplo de uso para orden ascendente:
+mainQuick :: IO ()
+mainQuick = do
+  let lista = [3, 1, 4, 1, 5, 9, 2, 6, 5]
+  print (quicksort (<) lista)
+
+ordenarPorTiempo :: [Auto] -> [Auto]
+ordenarPorTiempo [] = []
+ordenarPorTiempo conjuntoAutos = ordenarPorTiempo [y | y <- tiempoCarrera xs, (<) y tiempoCarrera x] ++ ordenarPorTiempo [y | y <- tiempoCarrera xs, not ((<) y x)]
+where conjuntoAutos = (x:xs)
+
+
+///
+
+Hacer que un conjunto de autos juegue una carrera, obteniendo los resultados parciales de cada vuelta, y la eliminación de los autos que no dan más en cada vuelta. La forma de modelar/representar la respuesta queda a criterio del grupo, pero debe poder responder lo siguiente:
+El auto ganador luego de todas las vueltas de la carrera. (LISTO)
+El tiempo total del segundo. (PENDIENTE)
+El tiempo parcial tras 2 vueltas del primer auto. (LISTO)
+Cantidad de autos que terminaron la carrera. <-- FALTA ESTE
+Crear el conjunto de tests que pruebe la lógica del ítem anterior. Esta vez se pide pensar los casos necesarios <-- FALTA ESTE
+
+//
 -}

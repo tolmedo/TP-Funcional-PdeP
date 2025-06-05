@@ -156,3 +156,48 @@ correrTests = hspec $ do
       paraEntendidos [ferrari {tiempoCarrera = 200}, peugeot] `shouldBe` False
     it "El grupo con un Ferrari con un tiempo de carrera de 200 y un Lamborghini con un tiempo de carrera de 200 es para entendidos" $ do
       paraEntendidos [ferrari {tiempoCarrera = 200}, lamborghini {tiempoCarrera = 200}] `shouldBe` True
+  
+  -------------------------------------------------------------
+  ---------------------- SEGUNDA ENTREGA ----------------------
+  describe "\n------ Casos de Prueba PUNTO 1a ------"  $ do
+  it "Un auto marca Peugeot NO está en buen estado" $ do
+      estaEnBuenEstado peugeot `shouldBe` False
+  it "Agregar un Ferrari (costo 65000) a un equipo con presupuesto 70000. El Ferrari se deberia agregar" $ do
+      agregarAuto UnEquipo {presupuesto = 70000} ferrari `shouldBe` UnEquipo {presupuesto = 5000, autos = [ferrari]}
+  it "Agregar un Fiat (costo 44000) a un equipo con presupuesto 50000 que ya tiene un Peugeot. El Fiat se agrega al equipo, el presupuesto se reduce en 44000" $ do
+      agregarAuto losTranquilos fiat `shouldBe` UnEquipo {presupuesto=6000, autos=[fiat,peugeot]}
+  describe "\n------ Casos de Prueba PUNTO 2 ------" $ do
+  it "Calcular el costo de reparación de un equipo con Ferrari (chasis 10), Lamborghini (chasis 20)" $ do
+      repararEquipo UnEquipo {autos = [ferrari {desgasteChasis = 10}, lamborghini {desgasteChasis = 20}]} `shouldBe` 12750
+  it "Calcular el costo de reparación de un equipo con Fiat (chasis 50), Peugeot (chasis 0)" $ do
+      repararEquipo UnEquipo {autos = [fiat {desgasteChasis = 50}, peugeot {desgasteChasis = 0}]} `shouldBe` 21250
+  describe "\n------ Casos de Prueba PUNTO 6 ------"
+  it "Una Ferrari y un Peugeot con desgaste 79 de ruedas pegan la vuelta a una pista vueltaALaManzana" $ do
+      head peganLaVuelta2 vueltaALaManzana [ferrari {desgasteRuedas = 79}, peugeot {desgasteRuedas = 79}] `shouldBe` ferrari {tiempoCarrera = 9.6}
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--1b
+
+
+
+
+
+
+
