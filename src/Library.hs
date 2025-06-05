@@ -238,7 +238,7 @@ tieneFerrari :: Equipo -> Bool
 tieneFerrari equipo = head (autos equipo) == ferrari
 
 tieneFiat :: Equipo -> Bool
-tieneFiat equipo = head (autos equipo) == fiat && presupuesto equipo == 44000
+tieneFiat equipo = head (autos equipo) == fiat && presupuesto equipo == 6000
 
 ------------------------------ PUNTO 1 ------------------------------
 ---------------------- EQUIPOS DE COMPETICIÓN -----------------------
@@ -411,6 +411,8 @@ entrarONoABoxes auto
     |not(estaEnBuenEstado auto) = repararAuto auto {tiempoCarrera = tiempoCarrera auto + 10}
     |otherwise = auto
 
+
+
 -----------------------TRAMO MOJADO--------------------------------------
 
 aplicarMojado ::  Auto -> Auto -> Tramo -> Auto
@@ -471,6 +473,7 @@ pasarPorTramo2 auto tramo
     
 ------------------------------ PUNTO 6 ------------------------------
 ------------------------ ATRAVESANDO PISTAS -------------------------
+
 data Pista = UnaPista{
     nombrePista :: String,
     pais :: String,
@@ -571,44 +574,5 @@ autoDeMejorTiempo primerAuto segundoAuto
 cantidadAutosQueTerminaron ::  Carrera -> [Auto] -> Number
 cantidadAutosQueTerminaron carrera autos = length (correrCarrera carrera autos)
 
-{- ENTREGA 2
-
-1. a) REVISADO (B)
-   b) REVISADO (B)
-   c) REVISADO (B)   
-   d) REVISADO (B)
-   
-2. REVISADO (B)
-
-3. REVISADO (B)
-
-4. a) REVISADO (B)
-
-   b) agregar mojado --> R E V I S A R
-    suma 50% mas del tiempo de carrera que produce originalmente
-   
-   c) REVISADO (B)
-
-   d) REVISADO (B) // Recordar revisar metrosObstruidos
-
-   e) REVISADO (B) // Revisar la función mamushka
-
-5. REVISADO (B)
-
-6. REVISADO (B)
-
-7. revisar con punto 4
-
-// FALTAN LOS TEST
-
-Hacer que un conjunto de autos juegue una carrera, obteniendo los resultados parciales de cada vuelta, y la eliminación de los autos que no dan más en cada vuelta. La forma de modelar/representar la respuesta queda a criterio del grupo, pero debe poder responder lo siguiente:
-El auto ganador luego de todas las vueltas de la carrera. (LISTO)
-El tiempo total del segundo. (PENDIENTE)
-El tiempo parcial tras 2 vueltas del primer auto. (LISTO)
-Cantidad de autos que terminaron la carrera. <-- FALTA ESTE
-Crear el conjunto de tests que pruebe la lógica del ítem anterior. Esta vez se pide pensar los casos necesarios <-- FALTA ESTE
-
-//
--}
-
-
+tiempoTotalSegundo :: Carrera -> [Auto] -> Number
+tiempoTotalSegundo carrera autos = tiempoCarrera (correrCarrera carrera autos!!1)
