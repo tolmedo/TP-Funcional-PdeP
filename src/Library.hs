@@ -1,3 +1,8 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
+{-# HLINT ignore "Use null" #-}
+
+
 module Library where 
 import PdePreludat
 
@@ -13,7 +18,7 @@ data Auto = UnAuto{
     velocidadMax :: Number,
     tiempoCarrera :: Number,
     apodo :: [String]
-} deriving Show
+} deriving (Show, Eq)
 
 data Tramo = UnTramo{
     angulo :: Number,
@@ -227,6 +232,13 @@ todoOk auto = estaEnBuenEstado auto && menorIgualA200SegEnCarrera auto
 ------------------------------ Segunda ------------------------------
 ------------------------------ Entrega ------------------------------
 ---------------------------------------------------------------------
+ 
+--funciones credas para los tests
+tieneFerrari :: Equipo -> Bool
+tieneFerrari equipo = head (autos equipo) == ferrari
+
+tieneFiat :: Equipo -> Bool
+tieneFiat equipo = head (autos equipo) == fiat && presupuesto equipo == 44000
 
 ------------------------------ PUNTO 1 ------------------------------
 ---------------------- EQUIPOS DE COMPETICIÓN -----------------------
@@ -268,7 +280,7 @@ losTops :: Equipo
 losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborghini{desgasteChasis=20}], presupuesto= 20000}
 
 unSueño :: Equipo
-unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}], presupuesto= 10000}
+unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}, peugeot{desgasteChasis=0}], presupuesto= 10000}
 
 {- --Equipo para tests más detallados. Aunque el presupuesto sería suficiente para reparar los dos ferraris, debe parar al encontrar al fiat
 unSueño' :: Equipo
@@ -400,6 +412,7 @@ entrarONoABoxes auto
     |otherwise = auto
 
 -----------------------TRAMO MOJADO--------------------------------------
+
 aplicarMojado ::  Auto -> Auto -> Tramo -> Auto
 aplicarMojado auto autoAntesDelTramo tramo
     |mojado (condiciones tramo) = auto {tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera auto autoAntesDelTramo *0.5}
@@ -420,9 +433,9 @@ duplicarEfecto autoModificado auto = auto  {
     tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera autoModificado auto *2,
     desgasteChasis = desgasteChasis auto + diferenciaParametro desgasteChasis autoModificado auto *2,
     desgasteRuedas = desgasteRuedas auto + diferenciaParametro desgasteRuedas autoModificado auto *2
-} 
+}
 
-diferenciaParametro :: (Auto -> Number ) -> Auto -> Auto -> Number
+diferenciaParametro :: (Auto -> Number) -> Auto -> Auto -> Number
 diferenciaParametro parametro autoModificado autoViejo = parametro autoModificado - parametro autoViejo
 
 ----------------------------TRAMO OBSTRUCCION-------------------------------
@@ -448,30 +461,6 @@ aplicarEfectosTramo auto tramo
 
 verificarModificadoresTramo :: Auto -> Tramo -> Auto
 verificarModificadoresTramo auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo auto tramo)tramo) auto tramo) auto tramo) tramo
-
-{-
-Explicacion funcion Mamushka: 
-
-funcionEstrella auto tramo  --> elige el tramo que se va recorrer y se lo aplica. Devuelve el autoLuegoDelTramo
-
-aplicarTurbo automodificado tramo --> Se fija si dentro del tramo el turbo esta activado. Si esta en true, lo modifica, sino lo deja igual
-
-aplicarObstruccion automodificadoQueDevolvioAplicarTurbo tramo -->verifica si le estan pasando una cantidad de metros. Si es distinto de 0 es porque hay obstruccion y le aplica los cambios. Sino, lo deja pasar
-
-aplicarRipio autoModificadoQueDevolvioObstruccion auto(el que te ingresan por consola, sin aplicar efectos de tramo) tramo  --> En esta version de aplicar ripio, necesita calcula la diferencia y para eso necesita el auto antes del tramo. Luego, lo mismo de siempre, verifica si el tramo tiene en True el ripio, si SI le aplica los cambios. Si NO lo deja pasar
-
-aplicarMojado autoModificadoQueDovolvioRipio tramo --> Verifica si el tramo tiene en True el mojado, si SI le aplica los cambios. Si NO, lo deja pasar 
-
-aplicarBoxes autoModificadoQueDevolvioMojado tramo --> Verifica si el tramo tiene en True Boxes. Si lo tiene, le aplica al auto la funcion de ver si el auto puede entrar o no a Boxes (y esa segunda funcion verifica si puede entrar o no). Si no lo tiene en True, lo deja salir sin cambios
--}
-
-
-{-Pregunta[1]: Podria hacer que la funcionMamushka reciba el Number de MtsObstruccion, pero cada vez que se use funcionMamushka deberia pasarle un numero, independientemente que se use o no. Ejemplos de como seria el "pasaje por consola"
-Ej si se usa Obstruccion: autitoX tramoX 20  (aca le paso el auto, el tramo y los metros de obstruccion, porque si aplico obstruccion)
-Ej si NO se usa obstruccion: autitoX tramoX 0 (tendria que pasarle mtsObstruccion 0)
-
-Por eso directamente estoy haciendo que en el modelado del tramo, en condiciones, Obstruccion no sea un Bool, sino un Number y en caso de que no haya obstruccion que la obstruccion sea =0 y si SI hay que sea /= 0
--}
 
 ------------------------------ PUNTO 5 ------------------------------
 
@@ -538,7 +527,7 @@ superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEnt
 --------------- PeganLaVuelta/2 ---------------
 
 peganLaVuelta2 :: Pista -> [Auto] -> [Auto]
-peganLaVuelta2 pista conjuntoAutos = map (recorrerUnRecorrido  (recorrido pista)) conjuntoAutos
+peganLaVuelta2 pista conjuntoAutos = map (recorrerUnRecorrido (recorrido pista)) conjuntoAutos
 
 recorrerUnRecorrido :: [Tramo] -> Auto -> Auto
 recorrerUnRecorrido conjuntoDeTramos auto = foldl pasarPorTramo2  auto conjuntoDeTramos
@@ -551,6 +540,9 @@ data Carrera = UnaCarrera{
     vueltas :: Number
 } deriving Show
 
+tourDeItalia :: Carrera
+tourDeItalia = UnaCarrera { pista=vueltaALaManzana, vueltas=10 }
+
 tourBuenosAires :: Carrera  
 tourBuenosAires = UnaCarrera { pista=superPista, vueltas=20 }
 
@@ -558,13 +550,15 @@ sacarNoDaMas :: [Auto] -> [Auto]
 sacarNoDaMas autos = filter (not . autoNoDaMas) autos
 
 correrCarrera :: Carrera -> [Auto] -> [Auto]
-correrCarrera carrera autos = iterate (peganLaVuelta2 (pista carrera)) (sacarNoDaMas autos) !! (vueltas carrera)
+correrCarrera carrera conjuntoAutos
+    | vueltas carrera == 0 || conjuntoAutos == [] = conjuntoAutos
+    | otherwise = correrCarrera (carrera{vueltas = vueltas carrera - 1}) (peganLaVuelta2 (pista carrera) (sacarNoDaMas conjuntoAutos))
 
-vuelta :: Number
-vuelta = 2
+tiempoParcialPrimero :: Carrera -> Number -> [Auto] -> Number
+tiempoParcialPrimero carrera vuelta conjuntoAuto = tiempoCarrera( head(correrCarrera carrera{vueltas = vuelta} conjuntoAuto))
 
-tiempoParcialPrimerAutoEn2Vueltas :: Carrera -> Number -> [Auto] -> Auto
-tiempoParcialPrimerAutoEn2Vueltas carrera vuelta auto = head (correrCarrera carrera {vueltas = vuelta} auto)
+tiempoParcial :: Carrera -> Number ->[Auto] -> [Auto]
+tiempoParcial carrera vuelta conjuntoAuto = correrCarrera carrera{vueltas=vuelta} conjuntoAuto
 
 darGanador :: Carrera -> [Auto] -> Auto
 darGanador carrera autos = foldl1 autoDeMejorTiempo (correrCarrera carrera autos)
@@ -573,6 +567,9 @@ autoDeMejorTiempo :: Auto -> Auto -> Auto
 autoDeMejorTiempo primerAuto segundoAuto
     | tiempoCarrera primerAuto > tiempoCarrera segundoAuto = segundoAuto
     | otherwise = primerAuto
+
+cantidadAutosQueTerminaron ::  Carrera -> [Auto] -> Number
+cantidadAutosQueTerminaron carrera autos = length (correrCarrera carrera autos)
 
 {- ENTREGA 2
 
@@ -600,36 +597,9 @@ autoDeMejorTiempo primerAuto segundoAuto
 
 6. REVISADO (B)
 
-7.
-
-data Carrera = unaCarrera{
-    pista :: Pista,
-    vueltas :: Number
-} deriving Show
-hacer una funcion "correrCarrera" que reciba una carrera y lista de autos o equipos y que simule la carrera.
+7. revisar con punto 4
 
 // FALTAN LOS TEST
-
-
--- Implementación simple de quicksort con predicado personalizado
-quicksort :: (a -> a -> Bool) -> [a] -> [a]
-quicksort _ []     = []
-quicksort cmp (x:xs) =
-  quicksort cmp [y | y <- xs, cmp y x] ++ [x] ++ quicksort cmp [y | y <- xs, not (cmp y x)]
-
--- Ejemplo de uso para orden ascendente:
-mainQuick :: IO ()
-mainQuick = do
-  let lista = [3, 1, 4, 1, 5, 9, 2, 6, 5]
-  print (quicksort (<) lista)
-
-ordenarPorTiempo :: [Auto] -> [Auto]
-ordenarPorTiempo [] = []
-ordenarPorTiempo conjuntoAutos = ordenarPorTiempo [y | y <- tiempoCarrera xs, (<) y tiempoCarrera x] ++ ordenarPorTiempo [y | y <- tiempoCarrera xs, not ((<) y x)]
-where conjuntoAutos = (x:xs)
-
-
-///
 
 Hacer que un conjunto de autos juegue una carrera, obteniendo los resultados parciales de cada vuelta, y la eliminación de los autos que no dan más en cada vuelta. La forma de modelar/representar la respuesta queda a criterio del grupo, pero debe poder responder lo siguiente:
 El auto ganador luego de todas las vueltas de la carrera. (LISTO)
@@ -640,3 +610,5 @@ Crear el conjunto de tests que pruebe la lógica del ítem anterior. Esta vez se
 
 //
 -}
+
+
