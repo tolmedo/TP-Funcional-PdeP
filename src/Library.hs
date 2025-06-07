@@ -3,41 +3,45 @@
 {-# HLINT ignore "Use null" #-}
 
 
-module Library where 
+module Library where
+import Data.List (sort)
 import PdePreludat
+
 
 doble :: Number -> Number
 doble numero = numero + numero
 
 ------------- DATA ---------------
 data Auto = UnAuto{
+    tiempoCarrera :: Number,
     marca :: String,
     modelo :: String,
     desgasteChasis :: Number,
     desgasteRuedas :: Number,
     velocidadMax :: Number,
-    tiempoCarrera :: Number,
     apodo :: [String]
-} deriving (Show, Eq)
+} deriving (Show, Ord, Eq)
 
-data Tramo = UnTramo{
-    angulo :: Number,
-    longitud :: Number,
-    cambios :: Number,
-    diametro :: Number,
-    condiciones:: Condiciones 
+type Tramo = Auto -> Auto
+
+data Equipo = UnEquipo{
+    nombre :: String,
+    autos :: [Auto],
+    presupuesto :: Number
 } deriving Show
 
-data Condiciones = Condiciones{
-    boxes :: Bool,
-    ripio :: Bool,
-    mojado :: Bool,
-    obstruccion :: Number, 
-    turbo :: Bool
-}deriving Show
+data Pista = UnaPista{
+    nombrePista :: String,
+    pais :: String,
+    precioEntrada :: Number,
+    recorrido :: [Tramo]
+} deriving Show
 
-condicionesBasicas :: Condiciones
-condicionesBasicas = Condiciones{boxes=False, ripio=False, mojado=False, obstruccion=0, turbo=False}
+data Carrera = UnaCarrera{
+    pista :: Pista,
+    vueltas :: Number
+} deriving Show
+
 ----------- ENTREGA 1 ----------------------
 --------------------------------------------
 
@@ -146,63 +150,61 @@ bautizarAuto apodoNuevo auto = auto {apodo = apodoNuevo : apodo auto}
 llevarAutoDesarmadero :: Auto -> String -> String -> Auto
 llevarAutoDesarmadero auto nuevamarca nuevomodelo = auto {marca = nuevamarca, modelo = nuevomodelo, apodo = ["Nunca Taxi"]}
 
-
 ------------------------------ PUNTO 4 ------------------------------
 ----------------------------- ¡PISTAS! ------------------------------
 
 --------------------Curvas--------------------
+crearCurva :: Number -> Number -> Tramo
+crearCurva angulo longitud auto = auto {
+    tiempoCarrera = (tiempoCarrera auto) + (longitud / (velocidadMax auto / 2)),
+    desgasteRuedas = desgasteRuedas auto + (3 * (longitud / angulo))
+}
+
 curvaPeligrosa :: Tramo
-curvaPeligrosa = UnTramo {angulo = 60, longitud = 300, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
+curvaPeligrosa = crearCurva 60 300
 
 curvaTranca :: Tramo
-curvaTranca = UnTramo {angulo = 110, longitud = 550, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
-
-transitarCurva :: Tramo -> Auto -> Auto
-transitarCurva tramo auto = auto {
-    desgasteRuedas = desgasteRuedas auto + 3 * longitud tramo / angulo tramo,
-    tiempoCarrera = tiempoCarrera auto + longitud tramo / (velocidadMax auto / 2)
-}
+curvaTranca = crearCurva 110 550
 
 --------------------Rectos--------------------
+crearRecto :: Number -> Tramo
+crearRecto longitud auto = auto {
+    tiempoCarrera = tiempoCarrera auto + longitud / velocidadMax auto,
+    desgasteChasis = desgasteChasis auto + 0.01 * longitud
+}
+
 tramoRectoClassic :: Tramo
-tramoRectoClassic = UnTramo {angulo = 0, longitud = 715, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
+tramoRectoClassic = crearRecto 715
 
 tramito :: Tramo
-tramito = UnTramo {angulo = 0, longitud = 260, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
-
-transitarRecto :: Tramo -> Auto -> Auto
-transitarRecto tramo auto = auto {
-    tiempoCarrera = tiempoCarrera auto + longitud tramo / velocidadMax auto,
-    desgasteChasis = desgasteChasis auto + 0.01 * longitud tramo
-}
+tramito = crearRecto 260
 
 --------------------ZigZag--------------------
-zigZagLoco :: Tramo 
-zigZagLoco = UnTramo {angulo = 0, longitud = 0, cambios = 5, diametro = 0, condiciones=condicionesBasicas}
-
-casiCurva :: Tramo 
-casiCurva = UnTramo {angulo = 0, longitud = 0, cambios = 1, diametro = 0, condiciones=condicionesBasicas}
-
-transitarZigZag :: Tramo -> Auto -> Auto
-transitarZigZag tramo auto = auto {
-    tiempoCarrera = tiempoCarrera auto + cambios tramo * 3,
+crearZigZag :: Number -> Tramo
+crearZigZag cambios auto = auto {
+    tiempoCarrera = tiempoCarrera auto + cambios * 3,
     desgasteChasis = desgasteChasis auto + 5,
-    desgasteRuedas = desgasteRuedas auto + velocidadMax auto * cambios tramo / 10
+    desgasteRuedas = desgasteRuedas auto + velocidadMax auto * cambios / 10
 }
+
+zigZagLoco :: Tramo
+zigZagLoco = crearZigZag 5
+
+casiCurva :: Tramo
+casiCurva = crearZigZag 1
 
 --------------------Rulos--------------------
-ruloClasico :: Tramo
-ruloClasico  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 13, condiciones=condicionesBasicas}
-
-deseoDeMuerte :: Tramo
-deseoDeMuerte  = UnTramo {angulo = 0, longitud = 0, cambios = 0, diametro = 26, condiciones=condicionesBasicas}
-
-transitarRulo :: Tramo -> Auto -> Auto
-transitarRulo tramo auto = auto {
-    desgasteRuedas = desgasteRuedas auto + diametro tramo * 1.5,
-    tiempoCarrera = tiempoCarrera auto + 5 * diametro tramo / velocidadMax auto
+crearRulo :: Number -> Tramo
+crearRulo diametro auto = auto {
+    desgasteRuedas = desgasteRuedas auto + diametro * 1.5,
+    tiempoCarrera = tiempoCarrera auto + 5 * diametro / velocidadMax auto
 }
 
+ruloClasico :: Tramo
+ruloClasico = crearRulo 13
+
+deseoDeMuerte :: Tramo
+deseoDeMuerte = crearRulo 26
 
 ------------------------------ PUNTO 5 ------------------------------
 -------------------------- NIVEL DE JOYEZ ---------------------------
@@ -232,7 +234,7 @@ todoOk auto = estaEnBuenEstado auto && menorIgualA200SegEnCarrera auto
 ------------------------------ Segunda ------------------------------
 ------------------------------ Entrega ------------------------------
 ---------------------------------------------------------------------
- 
+
 --funciones credas para los tests
 tieneFerrari :: Equipo -> Bool
 tieneFerrari equipo = head (autos equipo) == ferrari
@@ -243,11 +245,6 @@ tieneFiat equipo = head (autos equipo) == fiat && presupuesto equipo == 6000
 ------------------------------ PUNTO 1 ------------------------------
 ---------------------- EQUIPOS DE COMPETICIÓN -----------------------
 
-data Equipo = UnEquipo{
-    nombre :: String,
-    autos :: [Auto],
-    presupuesto :: Number
-} deriving Show
 
 losAlocados :: Equipo
 losAlocados = UnEquipo{nombre = "Los Alocados", autos = [ferrari, ferrari], presupuesto = 70000}
@@ -396,144 +393,109 @@ equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax au
 
 -----------------------TRAMO CON BOXES--------------------------------
 
-aplicarBoxes :: Auto -> Tramo -> Auto 
-aplicarBoxes auto tramo 
-    |boxes (condiciones tramo) = entrarONoABoxes auto
-    |otherwise = auto
+conBoxes :: Tramo -> Tramo
+conBoxes tramo auto
+    | not (estaEnBuenEstado (tramo auto)) = aplicarBoxes (tramo auto)
+    | otherwise = tramo auto
 
-entrarONoABoxes :: Auto -> Auto
-entrarONoABoxes auto
-    |not(estaEnBuenEstado auto) = repararAuto auto {tiempoCarrera = tiempoCarrera auto + 10}
-    |otherwise = auto
+aplicarBoxes :: Auto -> Auto
+aplicarBoxes auto = repararAuto auto {tiempoCarrera = tiempoCarrera auto + 10}
 
-
+rectoConBoxes :: Tramo -- Prueba
+rectoConBoxes = conBoxes tramoRectoClassic
 
 -----------------------TRAMO MOJADO--------------------------------------
 
-aplicarMojado ::  Auto -> Auto -> Tramo -> Auto
-aplicarMojado auto autoAntesDelTramo tramo
-    |mojado (condiciones tramo) = auto {tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera auto autoAntesDelTramo *0.5}
-    |otherwise = auto
+mojado :: Tramo -> Tramo
+mojado tramoOriginal = aplicarMojado . tramoOriginal
 
+aplicarMojado :: Auto -> Auto
+aplicarMojado auto = auto {tiempoCarrera = tiempoCarrera auto + tiempoCarrera auto * 0.5}
+
+curvaMojada :: Tramo -- Prueba
+curvaMojada = mojado curvaTranca
 -----------------------------TRAMO CON RIPIO----------------------------------
 
-aplicarRipio :: Auto -> Auto -> Tramo -> Auto 
-aplicarRipio  auto autoAntesDelTramo tramo
-    |ripio (condiciones tramo) = duplicarEfecto auto autoAntesDelTramo
-    |otherwise = auto
+conRipio :: Tramo -> Tramo
+conRipio tramoOriginal = aplicarRipio . tramoOriginal
 
-duplicarEfecto :: Auto -> Auto ->  Auto
-duplicarEfecto autoModificado auto = auto  {
-    tiempoCarrera = tiempoCarrera auto + diferenciaParametro tiempoCarrera autoModificado auto *2,
-    desgasteChasis = desgasteChasis auto + diferenciaParametro desgasteChasis autoModificado auto *2,
-    desgasteRuedas = desgasteRuedas auto + diferenciaParametro desgasteRuedas autoModificado auto *2
+aplicarRipio :: Auto ->  Auto
+aplicarRipio auto = auto {
+    tiempoCarrera = tiempoCarrera auto *2,
+    desgasteChasis = desgasteChasis auto *2,
+    desgasteRuedas = desgasteRuedas auto * 2
 }
 
-diferenciaParametro :: (Auto -> Number) -> Auto -> Auto -> Number
-diferenciaParametro parametro autoModificado autoViejo = parametro autoModificado - parametro autoViejo
+curvaConRipio :: Tramo -- Prueba
+curvaConRipio = conRipio curvaTranca 
 
 ----------------------------TRAMO OBSTRUCCION-------------------------------
-aplicarObstruccion :: Auto -> Tramo -> Auto 
-aplicarObstruccion auto tramo 
-    |obstruccion (condiciones tramo) /= 0 =  auto {desgasteRuedas = desgasteRuedas auto + 2 * obstruccion (condiciones tramo)}
-    |otherwise = auto
+
+conObstruccion :: Number -> Tramo -> Tramo
+conObstruccion metros tramo = aplicarObstruccion (metros). tramo
+
+aplicarObstruccion :: Number -> Auto -> Auto 
+aplicarObstruccion mtsObstruccion auto = auto {desgasteRuedas = desgasteRuedas auto + 2 * mtsObstruccion}
+
+rectoObstruido :: Tramo -- Prueba
+rectoObstruido = conObstruccion 2 tramoRectoClassic
 
 ----------------------------TRAMO CON TURBO--------------------------------
 
-aplicarTurbo :: Auto -> Tramo -> Auto  
-aplicarTurbo auto tramo 
-    |turbo (condiciones tramo) = (aplicarEfectosTramo auto{velocidadMax = velocidadMax auto *2} tramo){velocidadMax = velocidadMax auto} 
-    |otherwise = aplicarEfectosTramo auto tramo
+conTurbo :: Tramo -> Tramo
+conTurbo tramo = devolverVelocidad . tramo . aplicarTurbo
 
----------------------------------
-aplicarEfectosTramo :: Auto -> Tramo -> Auto 
-aplicarEfectosTramo auto tramo 
-    |angulo tramo /= 0 &&  longitud tramo /= 0 = transitarCurva tramo auto
-    |cambios tramo /= 0 = transitarZigZag tramo auto
-    |diametro tramo /= 0 = transitarRulo tramo auto
-    |otherwise = transitarRecto tramo auto
+aplicarTurbo :: Auto -> Auto  
+aplicarTurbo auto = (auto {velocidadMax = velocidadMax auto *2}) 
 
-verificarModificadoresTramo :: Auto -> Tramo -> Auto
-verificarModificadoresTramo auto tramo = aplicarBoxes (aplicarMojado (aplicarRipio (aplicarObstruccion(aplicarTurbo auto tramo)tramo) auto tramo) auto tramo) tramo
+devolverVelocidad :: Auto -> Auto 
+devolverVelocidad auto = auto {velocidadMax = velocidadMax auto / 2}
+
+rectoConTurbo :: Tramo
+rectoConTurbo = conTurbo tramoRectoClassic
+
 
 ------------------------------ PUNTO 5 ------------------------------
 
-pasarPorTramo2 :: Auto -> Tramo -> Auto
+pasarPorTramo2 :: Auto -> Tramo -> Auto-- (Tramo -> Auto -> Auto)
 pasarPorTramo2 auto tramo
     | autoNoDaMas auto = auto
-    | otherwise = verificarModificadoresTramo auto tramo
-    
+    | otherwise = tramo auto
+
 ------------------------------ PUNTO 6 ------------------------------
 ------------------------ ATRAVESANDO PISTAS -------------------------
-
-data Pista = UnaPista{
-    nombrePista :: String,
-    pais :: String,
-    precioEntrada :: Number,
-    recorrido :: [Tramo]
-} deriving Show
-
-crearRectoBasico :: Number -> Tramo
-crearRectoBasico longitudRecto = UnTramo{angulo = 0, longitud = longitudRecto, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
-
-crearCurvaBasica :: Number -> Number ->Tramo
-crearCurvaBasica anguloCurva longitudCurva = UnTramo{angulo = anguloCurva, longitud = longitudCurva, cambios = 0, diametro = 0, condiciones=condicionesBasicas}
-
-crearZigZagBasico :: Number -> Tramo
-crearZigZagBasico cambiosZigZag = UnTramo{angulo = 0, longitud = 0, cambios = cambiosZigZag, diametro = 0, condiciones=condicionesBasicas}
-
-crearRuloBasico :: Number -> Tramo
-crearRuloBasico diametroRulo = UnTramo{angulo = 0, longitud = 0, cambios = 0, diametro = diametroRulo, condiciones=condicionesBasicas}
 
 -------------- Vuelta a la Manzana --------------
 
 vueltaALaManzana :: Pista
 vueltaALaManzana = UnaPista{nombrePista = "La Manzana", pais = "Italia", precioEntrada = 30, recorrido = [
-    recto130, curva90, recto130, curva90, recto130, curva90, recto130, curva90]}
+    rectoManzana, curvaManzana, rectoManzana, curvaManzana, rectoManzana, curvaManzana, rectoManzana, curvaManzana]}
 
-recto130 :: Tramo
-recto130 = crearRectoBasico 130
+rectoManzana :: Tramo
+rectoManzana = crearRecto 130
 
-curva90 :: Tramo
-curva90 = crearCurvaBasica 90 13
+curvaManzana :: Tramo
+curvaManzana = crearCurva 90 13
 
 -------------- Super Pista --------------
 
 superPista :: Pista
-superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEntrada = 300, recorrido =[
-    tramoRectoClassic, 
-    curvaTranca,
-    tramito{condiciones= condicionesBasicas{turbo=True}}, --turbo
-    tramito{condiciones= condicionesBasicas{mojado=True}}, -- mojado
-    crearRuloBasico 10,
-    (crearCurvaBasica 80 400){condiciones= condicionesBasicas{obstruccion=2}}, --obstruccion 2m
-    crearCurvaBasica 115 650,
-    crearRectoBasico 970,
-    curvaPeligrosa,
-    tramito{condiciones= condicionesBasicas{ripio=True}}, --ripio
-    (crearRectoBasico 800){condiciones= condicionesBasicas{boxes=True}}, --boxes
-    casiCurva{condiciones= condicionesBasicas{obstruccion=5}}, --obstruccion 5m
-    crearZigZagBasico 2,
-    deseoDeMuerte{condiciones= condicionesBasicas{mojado=True, ripio=True}}, -- mojado ripio
-    ruloClasico,
-    zigZagLoco
-     ]}
+superPista = UnaPista{nombrePista = "Super Pista", pais = "Argentina", precioEntrada = 300, recorrido = recorridoSuperPista}
+
+recorridoSuperPista :: [Tramo]
+recorridoSuperPista = [tramoRectoClassic, curvaTranca, conTurbo tramito, mojado tramito, crearRulo 10, conObstruccion 2 (crearCurva 80 400), crearCurva 115 650, crearRecto 970,
+    curvaPeligrosa, conRipio tramito, conBoxes (crearRecto 800), conObstruccion 5 casiCurva, crearZigZag 2, mojado (conRipio deseoDeMuerte), ruloClasico, zigZagLoco]
 
 --------------- PeganLaVuelta/2 ---------------
 
 peganLaVuelta2 :: Pista -> [Auto] -> [Auto]
 peganLaVuelta2 pista conjuntoAutos = map (recorrerUnRecorrido (recorrido pista)) conjuntoAutos
 
-recorrerUnRecorrido :: [Tramo] -> Auto -> Auto
-recorrerUnRecorrido conjuntoDeTramos auto = foldl pasarPorTramo2  auto conjuntoDeTramos
+recorrerUnRecorrido :: [Tramo] -> Tramo
+recorrerUnRecorrido conjuntoDeTramos auto = foldl pasarPorTramo2 auto conjuntoDeTramos
 
 ------------------------------ PUNTO 7 ------------------------------
 ----------------------- TOUR DE BUENOS AIRES ------------------------
-
-data Carrera = UnaCarrera{
-    pista :: Pista,
-    vueltas :: Number
-} deriving Show
 
 tourDeItalia :: Carrera
 tourDeItalia = UnaCarrera { pista=vueltaALaManzana, vueltas=10 }
@@ -555,16 +517,27 @@ tiempoParcialPrimero carrera vuelta conjuntoAuto = tiempoCarrera( head(correrCar
 tiempoParcial :: Carrera -> Number ->[Auto] -> [Auto]
 tiempoParcial carrera vuelta conjuntoAuto = correrCarrera carrera{vueltas=vuelta} conjuntoAuto
 
+cantidadAutosQueTerminaron ::  Carrera -> [Auto] -> Number
+cantidadAutosQueTerminaron carrera autos = length (correrCarrera carrera autos)
+
+resultadosCarrera :: Carrera -> [Auto] -> [Auto]
+resultadosCarrera carrera autos = sort (correrCarrera carrera autos)
+
 darGanador :: Carrera -> [Auto] -> Auto
-darGanador carrera autos = foldl1 autoDeMejorTiempo (correrCarrera carrera autos)
+darGanador carrera autos = (head . resultadosCarrera carrera) autos
+
+tiempoTotalSegundo:: Carrera -> [Auto] -> Number
+tiempoTotalSegundo carrera autos = tiempoCarrera (resultadosCarrera carrera autos !! 1)
+
+{- FUNCIONES PASADAS
+--darGanador :: Carrera -> [Auto] -> Auto
+--darGanador carrera autos = foldl1 autoDeMejorTiempo (correrCarrera carrera autos)
 
 autoDeMejorTiempo :: Auto -> Auto -> Auto
 autoDeMejorTiempo primerAuto segundoAuto
     | tiempoCarrera primerAuto > tiempoCarrera segundoAuto = segundoAuto
     | otherwise = primerAuto
 
-cantidadAutosQueTerminaron ::  Carrera -> [Auto] -> Number
-cantidadAutosQueTerminaron carrera autos = length (correrCarrera carrera autos)
-
 tiempoTotalSegundo :: Carrera -> [Auto] -> Number
 tiempoTotalSegundo carrera autos = tiempoCarrera (correrCarrera carrera autos!!1)
+-}
