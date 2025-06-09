@@ -63,7 +63,6 @@ correrTests = hspec $ do
         desgasteChasis (repararAuto fiat) `shouldBe` 4.95
     it "Reparar un auto de marca Fiat debería tener  0 en ruedas" $ do
         desgasteRuedas (repararAuto fiat) `shouldBe` 0
-    
     it "Reparar un auto de marca Ferrari debería mantener sus desgastes en de chasis en 0 " $ do
         desgasteChasis (repararAuto ferrari) `shouldBe` 0
     it "Reparar un auto de marca Ferrari debería mantener sus desgastes de ruedas 0" $ do
@@ -93,56 +92,55 @@ correrTests = hspec $ do
         modelo(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` "X"
     it "Llevar a un desarmadero a un auto marca Fiat para cambiar por marca `Tesla` modelo `X`, solo debería tener el apodo `Nunca Taxi`" $ do
         apodo(llevarAutoDesarmadero fiat "Tesla" "X" ) `shouldBe` ["Nunca Taxi"]
-        {-
     -- punto 4 --
   describe "\n------ Casos de Prueba PUNTO 4a ------" $ do
     it "Transitar una curva peligrosa con un auto marca Ferrari deja el desgaste de ruedas en 15" $ do
-      desgasteRuedas (transitarCurva curvaPeligrosa ferrari) `shouldBe` 15 
+      desgasteRuedas (curvaPeligrosa ferrari) `shouldBe` 15 
     it "Transitar una curva peligrosa  con un auto marca Ferrari mantiene el desgaste de chasis en 0" $ do
-      desgasteChasis (transitarCurva curvaPeligrosa ferrari) `shouldBe` 0
+      desgasteChasis (curvaPeligrosa ferrari) `shouldBe` 0
     it "Transitar una curva peligrosa  con un auto marca Peugeot el tiempo en pista es de 15" $ do
-      tiempoCarrera (transitarCurva curvaPeligrosa peugeot) `shouldBe` 15 
+      tiempoCarrera (curvaPeligrosa peugeot) `shouldBe` 15 
     it "Transitar una curva tranca  con un auto marca Ferrari deja el desgaste de ruedas en 15" $ do
-      desgasteRuedas (transitarCurva curvaTranca ferrari) `shouldBe` 15 
+      desgasteRuedas (curvaTranca ferrari) `shouldBe` 15 
     it "Transitar una curva tranca  con un auto marca Ferrari mantiene el desgaste de chasis en 0" $ do
-      desgasteChasis (transitarCurva curvaTranca ferrari) `shouldBe` 0
+      desgasteChasis (curvaTranca ferrari) `shouldBe` 0
     it "Transitar una curva tranca  con un auto marca Peugeot el tiempo en pista es de 27.5" $ do
-      tiempoCarrera (transitarCurva curvaTranca peugeot) `shouldBe` 27.5
+      tiempoCarrera (curvaTranca peugeot) `shouldBe` 27.5
   describe "\n------ Casos de Prueba PUNTO 4b ------" $ do
     it "Transitar un tramo retro classic con un auto marca Ferrari tiene un desgaste de chasis de 7.15" $ do
-      desgasteChasis (transitarRecto tramoRectoClassic ferrari) `shouldBe` 7.15
+      desgasteChasis (tramoRectoClassic ferrari) `shouldBe` 7.15
     it "Transitar un tramo retro classic con un auto marca Ferrari el tiempo en pista es de 11" $ do
-      tiempoCarrera (transitarRecto tramoRectoClassic ferrari) `shouldBe` 11
+      tiempoCarrera (tramoRectoClassic ferrari) `shouldBe` 11
     it "Transitar un tramito con un auto marca Ferrari tiene un desgaste de chasis de 2.6" $ do
-      desgasteChasis (transitarRecto tramito ferrari) `shouldBe` 2.6
+      desgasteChasis (tramito ferrari) `shouldBe` 2.6
     it "Transitar un tramito con un auto marca Ferrari el tiempo en pista es de 4" $ do
-      tiempoCarrera (transitarRecto tramito ferrari) `shouldBe` 4
+      tiempoCarrera (tramito ferrari) `shouldBe` 4
   describe "\n------ Casos de Prueba PUNTO 4c ------" $ do
     it "Transitar un tramo zigZagLoco con un auto marca Ferrari Tiene un desgaste de chasis de 5" $ do
-      desgasteChasis (transitarZigZag zigZagLoco ferrari) `shouldBe` 5
+      desgasteChasis (zigZagLoco ferrari) `shouldBe` 5
     it "Transitar un tramo zigZagLoco con un auto marca Ferrari Tiene un desgaste de ruedas de 32.5" $ do
-      desgasteRuedas (transitarZigZag zigZagLoco ferrari) `shouldBe` 32.5
+      desgasteRuedas (zigZagLoco ferrari) `shouldBe` 32.5
     it "Transitar un tramo zigZagLoco con un auto marca Ferrari El tiempo en pista es de 15" $ do
-      tiempoCarrera (transitarZigZag zigZagLoco ferrari) `shouldBe` 15
+      tiempoCarrera (zigZagLoco ferrari) `shouldBe` 15
     it "Transitar un tramo casiCurva con un auto marca Ferrari Tiene un desgaste de chasis de 5" $ do
-      desgasteChasis (transitarZigZag casiCurva ferrari) `shouldBe` 5
+      desgasteChasis (casiCurva ferrari) `shouldBe` 5
     it "Transitar un tramo casiCurva con un auto marca Ferrari Tiene un desgaste de ruedas de 6.5" $ do
-      desgasteRuedas (transitarZigZag casiCurva ferrari) `shouldBe` 6.5
+      desgasteRuedas (casiCurva ferrari) `shouldBe` 6.5
     it "Transitar un tramo casiCurva con un auto marca Ferrari El tiempo en pista es de 3" $ do
-      tiempoCarrera (transitarZigZag casiCurva ferrari) `shouldBe` 3
+      tiempoCarrera (casiCurva ferrari) `shouldBe` 3
   describe "\n------ Casos de Prueba PUNTO 4d ------" $ do
     it "Transitar un tramo ruloClasico con un auto marca Ferrari Tiene un desgaste de chasis de 0" $ do
-      desgasteChasis (transitarRulo ruloClasico ferrari) `shouldBe` 0
+      desgasteChasis (ruloClasico ferrari) `shouldBe` 0
     it "Transitar un tramo ruloClasico con un auto marca Ferrari Tiene un desgaste de ruedas de 19.5" $ do
-      desgasteRuedas (transitarRulo ruloClasico ferrari) `shouldBe` 19.5
+      desgasteRuedas (ruloClasico ferrari) `shouldBe` 19.5
     it "Transitar un tramo ruloClasico con  un auto marca Ferrari El tiempo en pista es de 1" $ do
-      tiempoCarrera (transitarRulo ruloClasico ferrari) `shouldBe` 1
+      tiempoCarrera (ruloClasico ferrari) `shouldBe` 1
     it "Transitar un tramo deseoDeMuerte con un auto marca Ferrari Tiene un desgaste de chasis de 0" $ do
-      desgasteChasis (transitarRulo deseoDeMuerte ferrari) `shouldBe` 0
+      desgasteChasis (deseoDeMuerte ferrari) `shouldBe` 0
     it "Transitar un tramo deseoDeMuerte con un auto marca Ferrari Tiene un desgaste de ruedas de 39.0" $ do
-      desgasteRuedas (transitarRulo deseoDeMuerte ferrari) `shouldBe` 39.0
+      desgasteRuedas (deseoDeMuerte ferrari) `shouldBe` 39.0
     it "Transitar un tramo deseoDeMuerte con un auto marca Ferrari El tiempo en pista es de 2" $ do
-      tiempoCarrera (transitarRulo deseoDeMuerte ferrari) `shouldBe` 2
+      tiempoCarrera (deseoDeMuerte ferrari) `shouldBe` 2
     -- punto 5 --
   describe "\n------ Casos de Prueba PUNTO 5a ------" $ do
     it "El nivel de joyez es de 0 para el Ferrari" $ do
@@ -175,12 +173,11 @@ correrTests = hspec $ do
     it "Una Ferrari y un Peugeot con desgaste 79 de ruedas pegan la vuelta a una pista vueltaALaManzana" $ do
       tiempoCarrera (last(peganLaVuelta2 vueltaALaManzana [ferrari {desgasteRuedas = 79}, peugeot {desgasteRuedas = 79}])) `shouldBe` 11.7
   describe "\n------ Casos de Prueba PUNTO 7 ------" $ do
-    it "Tiempo parcial del primer auto en la lista en completar la segunda vuelta" $ do
-      tiempoParcialPrimero tourDeItalia 2 [ferrari, peugeot, lamborghini, fiat] `shouldBe` 19.2
+    it "Tiempo parcial del primer auto en en completar la segunda vuelta" $ do
+      tiempoParcialPrimero tourDeItalia 2 [ferrari, peugeot, lamborghini, fiat] `shouldBe` (1248/73) --17.0958904109589041
     it "El ganador es el Lamborghini" $ do
-      darGanador tourDeItalia [ferrari, peugeot, lamborghini, fiat] `shouldBe` head(correrCarrera tourDeItalia [lamborghini])
+      marca (darGanador tourDeItalia [ferrari, peugeot, lamborghini, fiat]) `shouldBe` "Lamborghini"
     it "Cuantos autos terminaron la carrera" $ do
       cantidadAutosQueTerminaron tourDeItalia [ferrari, peugeot, lamborghini, fiat, fiat{desgasteRuedas=79}] `shouldBe` 4
-    it "Tiempo total del segundo en salir" $ do
-      tiempoTotalSegundo tourDeItalia [ferrari, peugeot, lamborghini, fiat] `shouldBe` 156
--}
+    it "Tiempo total del segundo" $ do
+      tiempoTotalSegundo tourDeItalia [ferrari, peugeot, lamborghini, fiat] `shouldBe` 96
