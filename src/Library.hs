@@ -245,7 +245,6 @@ tieneFiat equipo = head (autos equipo) == fiat && presupuesto equipo == 6000
 ------------------------------ PUNTO 1 ------------------------------
 ---------------------- EQUIPOS DE COMPETICIÓN -----------------------
 
-
 losAlocados :: Equipo
 losAlocados = UnEquipo{nombre = "Los Alocados", autos = [ferrari, ferrari], presupuesto = 70000}
 
@@ -274,7 +273,7 @@ costoInscripcion auto = velocidadMax auto * costoInscripcionPorMS
 ---------- Reparar equipo, Optimizar equipo o Ferrarizar equipo ----------
 
 losTops :: Equipo
-losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborghini{desgasteChasis=20}], presupuesto= 20000}
+losTops = UnEquipo{nombre="Los Tops", autos=[peugeot{desgasteChasis=10}, ferrari, lamborghini{desgasteChasis=20}], presupuesto= 20000}
 
 unSueño :: Equipo
 unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}, peugeot{desgasteChasis=0}], presupuesto= 10000}
@@ -285,17 +284,19 @@ muchosFiats = UnEquipo{nombre="Muchos Fiats", autos=[fiat, fiat, fiat, ferrari, 
 ferrarizar :: Auto -> Auto
 ferrarizar auto = llevarAutoDesarmadero auto "Ferrari" "F50"
 
-costoPorPuntoChasis :: Number
-costoPorPuntoChasis = 500
-
-costoNitroPorPuntoVelocidad :: Number
-costoNitroPorPuntoVelocidad = 100
+---------------- COSTOS ----------------
 
 costoReparacion :: Auto -> Number
 costoReparacion auto = desgasteChasis auto * costoPorPuntoChasis * (1 - porcentajeNecesario)
 
+costoPorPuntoChasis :: Number
+costoPorPuntoChasis = 500
+
 costoOptimizacion :: Auto -> Number
 costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
+
+costoNitroPorPuntoVelocidad :: Number
+costoNitroPorPuntoVelocidad = 100
 
 costoFerrarizar :: Auto -> Number
 costoFerrarizar auto
@@ -307,6 +308,8 @@ costoCambiosPrimerAuto tarea equipo
     | tarea == "reparar" = costoReparacion (head (autos equipo))
     | tarea == "optimizar" = costoOptimizacion (head (autos equipo))
     | tarea == "ferrarizar" = costoFerrarizar (head (autos equipo))
+
+---------------- CAMBIOS ----------------
 
 cambiosAlEquipo :: String -> Equipo -> Equipo
 cambiosAlEquipo tarea equipo
@@ -322,6 +325,8 @@ restoDelEquipo tarea equipo = cambiosAlEquipo tarea (equipo {autos = tail (autos
 nuevoPresupuesto :: String -> Equipo -> Number
 nuevoPresupuesto tarea equipo = presupuesto equipo - costoCambiosPrimerAuto tarea equipo
 
+---------------- CONDICIONES ----------------
+
 primeroSinPresupuesto :: String -> Equipo -> Bool
 primeroSinPresupuesto tarea equipo
     | tarea == "reparar" = presupuesto equipo < costoReparacion (head (autos equipo))
@@ -332,7 +337,22 @@ cambiosAlAuto :: String -> Auto -> Auto
 cambiosAlAuto tarea auto
     | tarea == "reparar" = repararAuto auto
     | tarea == "optimizar" = ponerleNitroAUnAuto auto
-    | tarea == "ferrarizar" = ferrarizar auto
+    | tarea == "ferrarizar"  && not (esFerrari auto) = ferrarizar auto
+    | otherwise = auto
+
+esFerrari :: Auto -> Bool
+esFerrari auto = marca auto == "Ferrari"
+
+---------------- Funciones ----------------
+
+repararEquipo :: Equipo -> Equipo
+repararEquipo equipo = cambiosAlEquipo "reparar" equipo
+
+optimizarEquipo :: Equipo -> Equipo
+optimizarEquipo equipo = cambiosAlEquipo "optimizar" equipo
+
+ferrarizarEquipo :: Equipo -> Equipo
+ferrarizarEquipo equipo = cambiosAlEquipo "ferrarizar" equipo
 
 ------------------------------ PUNTO 2 ------------------------------
 ----------------------- COSTO REPARACIÓN TOTAL ----------------------
@@ -501,10 +521,7 @@ correrCarrera carrera conjuntoAutos
     | otherwise = correrCarrera (carrera{vueltas = vueltas carrera - 1}) (peganLaVuelta2 (pista carrera) (sacarNoDaMas conjuntoAutos))
 
 tiempoParcialPrimero :: Carrera -> Number -> [Auto] -> Number
-tiempoParcialPrimero carrera vuelta conjuntoAuto = tiempoCarrera( head(correrCarrera carrera{vueltas = vuelta} conjuntoAuto))
-
-tiempoParcial :: Carrera -> Number ->[Auto] -> [Auto]
-tiempoParcial carrera vuelta conjuntoAuto = correrCarrera carrera{vueltas=vuelta} conjuntoAuto
+tiempoParcialPrimero carrera vuelta conjuntoAuto = tiempoCarrera(head (resultadosCarrera carrera{vueltas = vuelta} conjuntoAuto))
 
 cantidadAutosQueTerminaron ::  Carrera -> [Auto] -> Number
 cantidadAutosQueTerminaron carrera autos = length (correrCarrera carrera autos)
