@@ -156,7 +156,7 @@ llevarAutoDesarmadero auto nuevamarca nuevomodelo = auto {marca = nuevamarca, mo
 --------------------Curvas--------------------
 crearCurva :: Number -> Number -> Tramo
 crearCurva angulo longitud auto = auto {
-    tiempoCarrera = (tiempoCarrera auto) + (longitud / (velocidadMax auto / 2)),
+    tiempoCarrera = tiempoCarrera auto + (longitud / (velocidadMax auto / 2)),
     desgasteRuedas = desgasteRuedas auto + (3 * (longitud / angulo))
 }
 
@@ -271,7 +271,7 @@ inscripcionDentroDelPresupuesto auto presupuestoActual = costoInscripcion auto <
 costoInscripcion :: Auto -> Number
 costoInscripcion auto = velocidadMax auto * costoInscripcionPorMS
 
----------- Realizar una reparación de equipo ----------
+---------- Reparar equipo, Optimizar equipo o Ferrarizar equipo ----------
 
 losTops :: Equipo
 losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborghini{desgasteChasis=20}], presupuesto= 20000}
@@ -279,75 +279,60 @@ losTops = UnEquipo{nombre="Los Tops", autos=[ferrari{desgasteChasis=10}, lamborg
 unSueño :: Equipo
 unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}, peugeot{desgasteChasis=0}], presupuesto= 10000}
 
-costoReparacionPorPuntoChasis :: Number
-costoReparacionPorPuntoChasis = 500
-
-repararEquipo :: Equipo -> Equipo
-repararEquipo equipo
-    | null (autos equipo) = equipo
-    | primeroFueraDePresupuestoReparacion equipo = equipo
-    | otherwise = equipo{autos = repararAuto(head(autos equipo)) : autos (siguienteReparacionEquipo equipo), presupuesto = presupuesto (siguienteReparacionEquipo equipo)}
-
-siguienteReparacionEquipo :: Equipo -> Equipo
-siguienteReparacionEquipo equipo = repararEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoReparacionPrimerAutoEquipo equipo })
-
-primeroFueraDePresupuestoReparacion :: Equipo -> Bool
-primeroFueraDePresupuestoReparacion equipo = presupuesto equipo < costoReparacionPrimerAutoEquipo equipo
-
-costoReparacionPrimerAutoEquipo :: Equipo -> Number
-costoReparacionPrimerAutoEquipo =  costoReparacion . head . autos
-
-costoReparacion :: Auto -> Number
-costoReparacion auto = desgasteChasis auto * (1 - porcentajeNecesario) * costoReparacionPorPuntoChasis
-
----------- Optimizar autos de equipo ----------
-
-costoNitroPorPuntoVelocidad :: Number
-costoNitroPorPuntoVelocidad = 100
-
-optimizarEquipo :: Equipo -> Equipo
-optimizarEquipo equipo
-    | null (autos equipo) = equipo
-    | primeroFueraDePresupuestoOptimizacion equipo = equipo
-    | otherwise = equipo{autos = ponerleNitroAUnAuto(head(autos equipo)) : autos (siguienteOptimizacionEquipo equipo), presupuesto = presupuesto (siguienteOptimizacionEquipo equipo)}
-
-siguienteOptimizacionEquipo :: Equipo -> Equipo
-siguienteOptimizacionEquipo equipo = optimizarEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoOptimizacionPrimerAutoEquipo equipo })
-
-primeroFueraDePresupuestoOptimizacion :: Equipo -> Bool
-primeroFueraDePresupuestoOptimizacion equipo = presupuesto equipo < costoOptimizacionPrimerAutoEquipo equipo
-
-costoOptimizacionPrimerAutoEquipo :: Equipo -> Number
-costoOptimizacionPrimerAutoEquipo =  costoOptimizacion . head . autos
-
-costoOptimizacion :: Auto -> Number
-costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
-
----------- Optimizar autos de equipo ----------
-
 muchosFiats :: Equipo
 muchosFiats = UnEquipo{nombre="Muchos Fiats", autos=[fiat, fiat, fiat, ferrari, fiat, fiat], presupuesto= 20000}
-
-costoFerrarizar :: Number
-costoFerrarizar = 3500
-
-ferrarizarEquipo :: Equipo -> Equipo
-ferrarizarEquipo equipo
-    | null (autos equipo) || presupuesto equipo < costoFerrarizar = equipo
-    | primeroFerrari(autos equipo)= equipo{autos = head(autos equipo) : autos(siguienteSiYaFerrari equipo), presupuesto = presupuesto (siguienteSiYaFerrari equipo)}
-    | otherwise = equipo{autos = ferrarizar( head(autos equipo) ) : autos (siguienteFerrarizarEquipo equipo), presupuesto = presupuesto (siguienteFerrarizarEquipo equipo)}
 
 ferrarizar :: Auto -> Auto
 ferrarizar auto = llevarAutoDesarmadero auto "Ferrari" "F50"
 
-primeroFerrari :: [Auto] -> Bool
-primeroFerrari conjuntoAutos = marca (head conjuntoAutos) == "Ferrari"
+costoPorPuntoChasis :: Number
+costoPorPuntoChasis = 500
 
-siguienteSiYaFerrari :: Equipo -> Equipo
-siguienteSiYaFerrari equipo = ferrarizarEquipo( equipo{autos=tail(autos equipo)})
+costoNitroPorPuntoVelocidad :: Number
+costoNitroPorPuntoVelocidad = 100
 
-siguienteFerrarizarEquipo :: Equipo -> Equipo
-siguienteFerrarizarEquipo equipo = ferrarizarEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoFerrarizar })
+costoReparacion :: Auto -> Number
+costoReparacion auto = desgasteChasis auto * costoPorPuntoChasis * (1 - porcentajeNecesario)
+
+costoOptimizacion :: Auto -> Number
+costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
+
+costoFerrarizar :: Auto -> Number
+costoFerrarizar auto
+    | marca auto == "Ferrari" = 0
+    | otherwise = 3500
+
+costoCambiosPrimerAuto :: String -> Equipo -> Number
+costoCambiosPrimerAuto tarea equipo
+    | tarea == "reparar" = costoReparacion (head (autos equipo))
+    | tarea == "optimizar" = costoOptimizacion (head (autos equipo))
+    | tarea == "ferrarizar" = costoFerrarizar (head (autos equipo))
+
+cambiosAlEquipo :: String -> Equipo -> Equipo
+cambiosAlEquipo tarea equipo
+    | autos equipo == [] || primeroSinPresupuesto tarea equipo = equipo
+    | otherwise = equipo {autos = primerAuto tarea equipo : autos (restoDelEquipo tarea equipo), presupuesto = presupuesto (restoDelEquipo tarea equipo)}
+
+primerAuto :: String -> Equipo -> Auto
+primerAuto tarea equipo = cambiosAlAuto tarea (head (autos equipo))
+
+restoDelEquipo :: String -> Equipo -> Equipo
+restoDelEquipo tarea equipo = cambiosAlEquipo tarea (equipo {autos = tail (autos equipo), presupuesto = nuevoPresupuesto tarea equipo})
+
+nuevoPresupuesto :: String -> Equipo -> Number
+nuevoPresupuesto tarea equipo = presupuesto equipo - costoCambiosPrimerAuto tarea equipo
+
+primeroSinPresupuesto :: String -> Equipo -> Bool
+primeroSinPresupuesto tarea equipo
+    | tarea == "reparar" = presupuesto equipo < costoReparacion (head (autos equipo))
+    | tarea == "optimizar" = presupuesto equipo < costoOptimizacion (head (autos equipo))
+    | tarea == "ferrarizar" = presupuesto equipo < costoFerrarizar (head (autos equipo))
+
+cambiosAlAuto :: String -> Auto -> Auto
+cambiosAlAuto tarea auto
+    | tarea == "reparar" = repararAuto auto
+    | tarea == "optimizar" = ponerleNitroAUnAuto auto
+    | tarea == "ferrarizar" = ferrarizar auto
 
 ------------------------------ PUNTO 2 ------------------------------
 ----------------------- COSTO REPARACIÓN TOTAL ----------------------
@@ -365,22 +350,25 @@ equipoInfinito :: Auto -> Number -> [Auto]
 equipoInfinito auto n = auto {desgasteChasis = 1, velocidadMax = velocidadMax auto *n} : equipoInfinito auto (n+1)
 
 {-
-    i. repararEquipo: al recibir como entrada un Equipo cuya lista de autos es infinita, esta función no podrá
-    mostrar ningún resultado al nunca terminar de procesar la información. Sin embargo, en "repararEquipo" se
-    evalúa el costo de reparación de cada auto y se los repara siempre y cuando el presupuesto sea suficiente.
-    Entonces, "repararEquipo" va a tener efectos en la lista de autos del equipo Infinia, específicamente va a
-    reparar los primeros 11 autos, pero por ser una lista infinita no va a poder mostrarla.
+    i. Reparar el equipo: para evitar repetición de lógica con Optimizar y Ferrarizar, se utiliza una única función
+    llamada "cambiosAlEquipo" que engloba los tres casos posibles; por practicidad vamos a centrarnos en el proceso
+    propio de la reparación. Por trabajar con métodos recursivos, al recibir un Equipo cuya lista de autos es infinita,
+    esta función no va a mostrar ningún resultado, debido a su incapacidad de procesar toda la información de la lista.
+    Sin embargo, al llamarse a la función "repararAuto" en la invocación, se evalúa el costo de reparar cada auto y se
+    reparan la cantidad de autos que permita el presupuesto del equipo. Por ende, en el caso del Equipo Infinia se van
+    a reparar sus primeros 11 autos, solo que no van a mostrarse por ser una lista infinita.
 
-    ii. optimizarEquipo: el caso de esta función será similar a "repararEquipo", en cuanto a que no podrá mostrar
-    ningún resultado porque recibe como entrada un Equipo que contiene una lista de autos infinita, la cual nunca
-    finalizará de procesar. Sin embargo, "optimizarEquipo" tampoco tiene efectos en el equipo Infinia, ya que ni
-    siquiera el primer auto de la lista podrá ser optimizado por falta de presupuesto. Para que al menos un auto
-    pudiera optimizarse, el presupuesto debería ser mínimo de 6500 (velocidadMax * costoNitroPorPuntoVelocidad).
+    ii. Optimización del equipo: este caso es similar al anterior al utilizarse "cambiosAlEquipo" y ser un Equipo cuya
+    lista de autos es infinita. No obstante, en este caso llamar a la función "ponerleNitroAUnAuto" (optimizarlo) no va
+    a tener efecto alguno en el Equipo Infinia, debido a que este se compone de infinitos ferraris, y para optimizar uno
+    solo se necesita un presupuesto mínimo de 6500, contra los 5000 de este equipo. Entonces, en este caso ningún auto se
+    podrá optimizar y, aunque alguno pudiera, los resultados no serían mostrados por ser una lista infinita.
 
-    iii. ferrarizarEquipo: esta función no va a poder mostrar ningún resultado ya que recibe un Equipo cuya lista
-    de autos es infinita. Si bien "ferrarizarEquipo" recorre la lista y ferrariza (cambia marca y modelo) hasta que
-    le alcance el presupuesto, al ser una lista infinita nunca va a mostrar ningún resultado. Además, el equipo Infinia
-    es un Equipo compuesto por completo de autos Ferrari, por lo que no tendría sentido aplicar esta función.
+    iii. Ferrarizar un equipo: nuevamente, en este caso se utiliza la función "cambiosAlEquipo" y, por ser un Equipo que
+    contiene una lista infinita, no van a poder mostrarse sus resultados. Si bien al llamar a la función "ferrarizar" se
+    recorrería la lista de autos de Infinia y se cambiarían tanto la marca como el modelo de los autos hasta que no haya
+    presupuesto suficiente, en este caso todos los autos son Ferrari, por lo que su invocación no tendría sentido alguno
+    al no suponer cambios ni en la lista de autos ni en el presupuesto del equipo.
 
     iv. costoReparacionEquipo: esta función no podrá mostrar resultado alguno, esto por recibir como entrada un Equipo
     cuya lista de autos es infinita. Por ende, cuando se intente aplicar la función "map costoReparacion", la evaluación
@@ -414,6 +402,7 @@ aplicarMojado auto = auto {tiempoCarrera = tiempoCarrera auto + tiempoCarrera au
 
 curvaMojada :: Tramo -- Prueba
 curvaMojada = mojado curvaTranca
+
 -----------------------------TRAMO CON RIPIO----------------------------------
 
 conRipio :: Tramo -> Tramo
@@ -423,7 +412,7 @@ aplicarRipio :: Auto ->  Auto
 aplicarRipio auto = auto {
     tiempoCarrera = tiempoCarrera auto *2,
     desgasteChasis = desgasteChasis auto *2,
-    desgasteRuedas = desgasteRuedas auto * 2
+    desgasteRuedas = desgasteRuedas auto *2
 }
 
 curvaConRipio :: Tramo -- Prueba
@@ -432,7 +421,7 @@ curvaConRipio = conRipio curvaTranca
 ----------------------------TRAMO OBSTRUCCION-------------------------------
 
 conObstruccion :: Number -> Tramo -> Tramo
-conObstruccion metros tramo = aplicarObstruccion (metros). tramo
+conObstruccion metros tramo = aplicarObstruccion metros . tramo
 
 aplicarObstruccion :: Number -> Auto -> Auto 
 aplicarObstruccion mtsObstruccion auto = auto {desgasteRuedas = desgasteRuedas auto + 2 * mtsObstruccion}
@@ -526,7 +515,7 @@ resultadosCarrera carrera autos = sort (correrCarrera carrera autos)
 darGanador :: Carrera -> [Auto] -> Auto
 darGanador carrera autos = (head . resultadosCarrera carrera) autos
 
-tiempoTotalSegundo:: Carrera -> [Auto] -> Number
+tiempoTotalSegundo :: Carrera -> [Auto] -> Number
 tiempoTotalSegundo carrera autos = tiempoCarrera (resultadosCarrera carrera autos !! 1)
 
 {- FUNCIONES PASADAS
@@ -540,4 +529,71 @@ autoDeMejorTiempo primerAuto segundoAuto
 
 tiempoTotalSegundo :: Carrera -> [Auto] -> Number
 tiempoTotalSegundo carrera autos = tiempoCarrera (correrCarrera carrera autos!!1)
+-}
+
+{-
+costoReparacionPorPuntoChasis :: Number
+costoReparacionPorPuntoChasis = 500
+
+repararEquipo :: Equipo -> Equipo
+repararEquipo equipo
+    | null (autos equipo) = equipo
+    | primeroFueraDePresupuestoReparacion equipo = equipo
+    | otherwise = equipo{autos = repararAuto(head(autos equipo)) : autos (siguienteReparacionEquipo equipo), presupuesto = presupuesto (siguienteReparacionEquipo equipo)}
+
+siguienteReparacionEquipo :: Equipo -> Equipo
+siguienteReparacionEquipo equipo = repararEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoReparacionPrimerAutoEquipo equipo })
+
+primeroFueraDePresupuestoReparacion :: Equipo -> Bool
+primeroFueraDePresupuestoReparacion equipo = presupuesto equipo < costoReparacionPrimerAutoEquipo equipo
+
+costoReparacionPrimerAutoEquipo :: Equipo -> Number
+costoReparacionPrimerAutoEquipo =  costoReparacion . head . autos
+
+costoReparacion :: Auto -> Number
+costoReparacion auto = desgasteChasis auto * (1 - porcentajeNecesario) * costoReparacionPorPuntoChasis
+
+---------- Optimizar autos de equipo ----------
+
+costoNitroPorPuntoVelocidad :: Number
+costoNitroPorPuntoVelocidad = 100
+
+optimizarEquipo :: Equipo -> Equipo
+optimizarEquipo equipo
+    | null (autos equipo) = equipo
+    | primeroFueraDePresupuestoOptimizacion equipo = equipo
+    | otherwise = equipo{autos = ponerleNitroAUnAuto(head(autos equipo)) : autos (siguienteOptimizacionEquipo equipo), presupuesto = presupuesto (siguienteOptimizacionEquipo equipo)}
+
+siguienteOptimizacionEquipo :: Equipo -> Equipo
+siguienteOptimizacionEquipo equipo = optimizarEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoOptimizacionPrimerAutoEquipo equipo })
+
+primeroFueraDePresupuestoOptimizacion :: Equipo -> Bool
+primeroFueraDePresupuestoOptimizacion equipo = presupuesto equipo < costoOptimizacionPrimerAutoEquipo equipo
+
+costoOptimizacionPrimerAutoEquipo :: Equipo -> Number
+costoOptimizacionPrimerAutoEquipo =  costoOptimizacion . head . autos
+
+costoOptimizacion :: Auto -> Number
+costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
+
+---- FERRARIZAR EQUIPO ----
+
+ferrarizarEquipo :: Equipo -> Equipo
+ferrarizarEquipo equipo
+    | null (autos equipo) || presupuesto equipo < costoFerrarizar = equipo
+    | primeroFerrari(autos equipo)= equipo{autos = head(autos equipo) : autos(siguienteSiYaFerrari equipo), presupuesto = presupuesto (siguienteSiYaFerrari equipo)}
+    | otherwise = equipo{autos = ferrarizar( head(autos equipo) ) : autos (siguienteFerrarizarEquipo equipo), presupuesto = presupuesto (siguienteFerrarizarEquipo equipo)}
+
+ferrarizar :: Auto -> Auto
+ferrarizar auto = llevarAutoDesarmadero auto "Ferrari" "F50"
+
+primeroFerrari :: [Auto] -> Bool
+primeroFerrari conjuntoAutos = marca (head conjuntoAutos) == "Ferrari"
+
+siguienteSiYaFerrari :: Equipo -> Equipo
+siguienteSiYaFerrari equipo = ferrarizarEquipo( equipo{autos=tail(autos equipo)})
+
+siguienteFerrarizarEquipo :: Equipo -> Equipo
+siguienteFerrarizarEquipo equipo = ferrarizarEquipo(equipo{autos= tail(autos equipo), presupuesto = presupuesto equipo - costoFerrarizar })
+
 -}
