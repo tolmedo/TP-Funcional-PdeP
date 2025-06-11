@@ -74,10 +74,10 @@ autoNoDaMas auto =
     (coincidePrimerApodo auto && desgasteChasis auto > 80) || desgasteRuedas auto > 80
 
 primerApodo :: Auto -> String
-primerApodo auto = head (apodo auto)
+primerApodo = head . apodo
 
 coincidePrimerApodo :: Auto -> Bool
-coincidePrimerApodo auto = take 2 (primerApodo auto)  == "La"
+coincidePrimerApodo = (== "La") . take 2 . primerApodo 
 
 ---------- Saber si un auto ES UN CHICHE ----------
 esUnChiche :: Auto -> Bool
@@ -86,7 +86,7 @@ esUnChiche auto
     | otherwise = desgasteChasis auto < 50
 
 cantidadApodos :: Auto -> Number
-cantidadApodos auto = length (apodo auto)
+cantidadApodos = length . apodo
 
 ---------- Saber si un auto ES UNA JOYA ----------
 esUnaJoya :: Auto -> Bool
@@ -100,11 +100,11 @@ nivelDeChetez :: Auto -> Number
 nivelDeChetez auto = 20 * cantidadApodos auto * caracteresModelo auto
 
 caracteresModelo :: Auto -> Number
-caracteresModelo auto = length (modelo auto)
+caracteresModelo = length . modelo 
 
 ---------- Determinar capacidad supercalifragilisticaespialidosa ----------
 determinarCapacidad :: Auto -> Number
-determinarCapacidad auto = length (primerApodo auto)
+determinarCapacidad = length . primerApodo
 
 ---------- Calcular qué tan RIESGOSO es un auto ----------
 riesgoAuto :: Auto -> Number
@@ -138,12 +138,12 @@ ponerleNitroAUnAuto :: Auto -> Auto
 ponerleNitroAUnAuto auto = auto {velocidadMax = velocidadMax auto + porcentaje 20 auto}
 
 porcentaje :: Number -> Auto -> Number
-porcentaje porciento auto = (porciento * velocidadMax auto)/ 100 
+porcentaje porciento = (/100).(porciento*).velocidadMax
 
 --------------------------Bautizar un Auto---------------------------
 
 bautizarAuto :: String -> Auto -> Auto 
-bautizarAuto apodoNuevo auto = auto {apodo = apodoNuevo : apodo auto} 
+bautizarAuto apodoNuevo auto = auto{apodo = apodoNuevo : apodo auto} 
 
 ------------------------Llevar un auto a un desarmadero--------------
 
@@ -159,6 +159,7 @@ crearCurva angulo longitud auto = auto {
     tiempoCarrera = tiempoCarrera auto + (longitud / (velocidadMax auto / 2)),
     desgasteRuedas = desgasteRuedas auto + (3 * (longitud / angulo))
 }
+
 
 curvaPeligrosa :: Tramo
 curvaPeligrosa = crearCurva 60 300
@@ -212,7 +213,7 @@ deseoDeMuerte = crearRulo 26
 ---------Nivel de Joyez-------------------
 
 nivelDeJoyez :: [Auto] -> Number
-nivelDeJoyez autos = sum (map unidadesDeJoyez (filter esUnaJoya autos))
+nivelDeJoyez = sum . map unidadesDeJoyez . filter esUnaJoya
 
 unidadesDeJoyez :: Auto -> Number
 unidadesDeJoyez auto
@@ -222,10 +223,10 @@ unidadesDeJoyez auto
 --------Para entendidos-------------------
 
 paraEntendidos :: [Auto] -> Bool
-paraEntendidos autos = all todoOk autos
+paraEntendidos = all todoOk 
 
 menorIgualA200SegEnCarrera :: Auto -> Bool
-menorIgualA200SegEnCarrera auto = tiempoCarrera auto <=200
+menorIgualA200SegEnCarrera = (<=200).tiempoCarrera
 
 todoOk :: Auto -> Bool
 todoOk auto = estaEnBuenEstado auto && menorIgualA200SegEnCarrera auto
@@ -237,10 +238,10 @@ todoOk auto = estaEnBuenEstado auto && menorIgualA200SegEnCarrera auto
 
 --funciones credas para los tests
 tieneFerrari :: Equipo -> Bool
-tieneFerrari equipo = head (autos equipo) == ferrari
+tieneFerrari = (== ferrari) . primerAuto
 
 tieneFiat :: Equipo -> Bool
-tieneFiat equipo = head (autos equipo) == fiat && presupuesto equipo == 6000
+tieneFiat equipo = (primerAuto equipo == fiat) && (presupuesto equipo == 6000)
 
 ------------------------------ PUNTO 1 ------------------------------
 ---------------------- EQUIPOS DE COMPETICIÓN -----------------------
@@ -281,19 +282,16 @@ unSueño = UnEquipo{nombre="Un Sueño", autos=[fiat{desgasteChasis=50}, peugeot{
 muchosFiats :: Equipo
 muchosFiats = UnEquipo{nombre="Muchos Fiats", autos=[fiat, fiat, fiat, ferrari, fiat, fiat], presupuesto= 20000}
 
-ferrarizar :: Auto -> Auto
-ferrarizar auto = llevarAutoDesarmadero auto "Ferrari" "F50"
-
 ---------------- COSTOS ----------------
 
 costoReparacion :: Auto -> Number
-costoReparacion auto = desgasteChasis auto * costoPorPuntoChasis * (1 - porcentajeNecesario)
+costoReparacion =  (*costoPorPuntoChasis).(*(1 - porcentajeNecesario)).desgasteChasis
 
 costoPorPuntoChasis :: Number
 costoPorPuntoChasis = 500
 
 costoOptimizacion :: Auto -> Number
-costoOptimizacion auto = velocidadMax auto * costoNitroPorPuntoVelocidad
+costoOptimizacion = (*costoNitroPorPuntoVelocidad).velocidadMax
 
 costoNitroPorPuntoVelocidad :: Number
 costoNitroPorPuntoVelocidad = 100
@@ -303,62 +301,49 @@ costoFerrarizar auto
     | marca auto == "Ferrari" = 0
     | otherwise = 3500
 
-costoCambiosPrimerAuto :: String -> Equipo -> Number
-costoCambiosPrimerAuto tarea equipo
-    | tarea == "reparar" = costoReparacion (head (autos equipo))
-    | tarea == "optimizar" = costoOptimizacion (head (autos equipo))
-    | tarea == "ferrarizar" = costoFerrarizar (head (autos equipo))
+ferrarizar :: Auto -> Auto
+ferrarizar auto
+    | esFerrari auto = auto
+    | otherwise = llevarAutoDesarmadero auto "Ferrari" "F50" 
+
+esFerrari :: Auto -> Bool
+esFerrari =  (== "Ferrari") . marca
 
 ---------------- CAMBIOS ----------------
 
-cambiosAlEquipo :: String -> Equipo -> Equipo
-cambiosAlEquipo tarea equipo
-    | autos equipo == [] || primeroSinPresupuesto tarea equipo = equipo
-    | otherwise = equipo {autos = primerAuto tarea equipo : autos (restoDelEquipo tarea equipo), presupuesto = presupuesto (restoDelEquipo tarea equipo)}
+cambiosAlEquipo :: (Auto -> Auto) -> (Auto -> Number) -> Equipo -> Equipo
+cambiosAlEquipo tarea costoTarea equipo
+    | autos equipo == [] || primeroSinPresupuesto costoTarea equipo = equipo
+    | otherwise = equipo {autos = tarea (primerAuto equipo) : autos (restoDelEquipo tarea costoTarea equipo), presupuesto = presupuesto (restoDelEquipo tarea costoTarea equipo)}
 
-primerAuto :: String -> Equipo -> Auto
-primerAuto tarea equipo = cambiosAlAuto tarea (head (autos equipo))
+primerAuto :: Equipo -> Auto
+primerAuto = head . autos
 
-restoDelEquipo :: String -> Equipo -> Equipo
-restoDelEquipo tarea equipo = cambiosAlEquipo tarea (equipo {autos = tail (autos equipo), presupuesto = nuevoPresupuesto tarea equipo})
+restoDelEquipo :: (Auto -> Auto) -> (Auto -> Number) -> Equipo -> Equipo
+restoDelEquipo tarea costoTarea equipo = cambiosAlEquipo tarea costoTarea (equipo {autos = tail (autos equipo), presupuesto = nuevoPresupuesto costoTarea equipo})
 
-nuevoPresupuesto :: String -> Equipo -> Number
-nuevoPresupuesto tarea equipo = presupuesto equipo - costoCambiosPrimerAuto tarea equipo
+nuevoPresupuesto :: (Auto -> Number) -> Equipo -> Number
+nuevoPresupuesto costoTarea equipo = presupuesto equipo - costoTarea (primerAuto equipo)
 
----------------- CONDICIONES ----------------
-
-primeroSinPresupuesto :: String -> Equipo -> Bool
-primeroSinPresupuesto tarea equipo
-    | tarea == "reparar" = presupuesto equipo < costoReparacion (head (autos equipo))
-    | tarea == "optimizar" = presupuesto equipo < costoOptimizacion (head (autos equipo))
-    | tarea == "ferrarizar" = presupuesto equipo < costoFerrarizar (head (autos equipo))
-
-cambiosAlAuto :: String -> Auto -> Auto
-cambiosAlAuto tarea auto
-    | tarea == "reparar" = repararAuto auto
-    | tarea == "optimizar" = ponerleNitroAUnAuto auto
-    | tarea == "ferrarizar"  && not (esFerrari auto) = ferrarizar auto
-    | otherwise = auto
-
-esFerrari :: Auto -> Bool
-esFerrari auto = marca auto == "Ferrari"
+primeroSinPresupuesto :: (Auto -> Number) -> Equipo -> Bool
+primeroSinPresupuesto costoTarea equipo = presupuesto equipo < costoTarea (primerAuto equipo)
 
 ---------------- Funciones ----------------
 
 repararEquipo :: Equipo -> Equipo
-repararEquipo equipo = cambiosAlEquipo "reparar" equipo
+repararEquipo = cambiosAlEquipo repararAuto costoReparacion
 
 optimizarEquipo :: Equipo -> Equipo
-optimizarEquipo equipo = cambiosAlEquipo "optimizar" equipo
+optimizarEquipo = cambiosAlEquipo ponerleNitroAUnAuto costoOptimizacion 
 
 ferrarizarEquipo :: Equipo -> Equipo
-ferrarizarEquipo equipo = cambiosAlEquipo "ferrarizar" equipo
+ferrarizarEquipo = cambiosAlEquipo ferrarizar costoFerrarizar
 
 ------------------------------ PUNTO 2 ------------------------------
 ----------------------- COSTO REPARACIÓN TOTAL ----------------------
 
 costoReparacionEquipo :: Equipo -> Number
-costoReparacionEquipo equipo = sum (map costoReparacion (autos equipo))
+costoReparacionEquipo = sum . map costoReparacion . autos
 
 ------------------------------ PUNTO 3 ------------------------------
 -------------------------- EQUIPO INFINIA ---------------------------
